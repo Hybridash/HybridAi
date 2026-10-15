@@ -6,7 +6,9 @@ Read this before every run. Newest entries at the bottom of each table.
 
 - Day counter: 1 (Day 1 = 2026-10-15). Day 1 Short done; next daily video is Day 2 (2026-10-16).
 - Week counter: 0. The first weekly update ("Week 1") is due Sunday 2026-10-18.
-- Last checked stats (2026-10-15, ~08:00 UTC): 0 subs, 0 views, 1 video, 0 comments.
+- Last checked stats (2026-10-15, ~20:55 UTC): 0 subs, 0 views, 1 public video (Day 1 Short still scheduled), 1 comment.
+- 2026-10-15 ~20:55 UTC: a second scheduled daily run fired the same day; skipped making a video because Day 1 already covers 2026-10-15 (one video a day).
+- First comment (2026-10-15): @Baroochi-yt on Ep 1, one word: "engagement". Real, can be credited by handle.
 - Owner asked (2026-10-15) to schedule videos for a set time instead of publishing immediately. Day 1 went out at 4:00 PM GMT-5 (5 PM ET). Studio's local time zone is GMT-5.
 - Channel not yet phone-verified: custom thumbnails and clickable description links don't work yet.
 
