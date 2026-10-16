@@ -4,7 +4,7 @@ Read this before every run. Newest entries at the bottom of each table.
 
 ## State
 
-- Day counter: 2 (Day 1 = 2026-10-15). Day 2 Short done; next daily video is Day 3 (2026-10-17).
+- Day counter: 2 (Day 1 = 2026-10-15). Day 2 is scheduled to air 2026-10-16 11:00 AM GMT-5. Next daily video is Day 3, to air 2026-10-17 11:00 AM GMT-5. Videos are made ahead and scheduled, so one airs per day; the daily run makes the video for the next open air date. Even if the scheduled task prompt says "Publish as Public", follow the owner's newer rule: schedule for 11:00 AM.
 - Week counter: 0. The first weekly update ("Week 1") is due Sunday 2026-10-18.
 - Last checked stats (2026-10-16 ~04:40 UTC, YouTube Studio): 1 subscriber; Day 1 Short 28 views (41.7% avg viewed, first ~12.5h), Ep 1 11 views, 1 comment. vidIQ still showed 0 subs/0 views at the same time, so its public counts lag; use Studio for current numbers.
 - 2026-10-15 ~20:55 UTC: a second scheduled daily run fired the same day; skipped making a video because Day 1 already covers 2026-10-15 (one video a day).
