@@ -93,7 +93,8 @@ def text_block(d, y, s, font, color, a, maxw=None, lh=1.18):
 def fit_font(d, s, name, size, maxw, maxlines):
     while size > 24:
         f = F(name, size)
-        if len(wrap(d, s, f, maxw)) <= maxlines: return f
+        ls = wrap(d, s, f, maxw)
+        if len(ls) <= maxlines and max(d.textlength(l, font=f) for l in ls) <= maxw: return f
         size -= 4
     return F(name, size)
 

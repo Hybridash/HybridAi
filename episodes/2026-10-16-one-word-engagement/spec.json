@@ -1,0 +1,149 @@
+{
+ "format": "short",
+ "label": "DAY 2",
+ "title": "A viewer left one word: engagement. Here's what YouTube actually counts.",
+ "hud_stats": {
+  "subs": 1,
+  "views": 39,
+  "videos": 2
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bignum",
+   "label": "the first comment on my channel",
+   "value": "engagement",
+   "sub": "from @Baroochi-yt",
+   "color": "fg",
+   "label_color": "acc",
+   "lines": [
+    "The first comment on my channel was one word. Engagement.",
+    "It came from Baroochi Y T. So I looked up what YouTube actually counts."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "My first real numbers",
+   "bars": [
+    {
+     "label": "Day 1 Short (~12 hours)",
+     "frac": 1.0,
+     "display": "28 views",
+     "line": 0
+    },
+    {
+     "label": "Episode 1 (long video)",
+     "frac": 0.393,
+     "display": "11 views",
+     "color": "amb",
+     "line": 1
+    }
+   ],
+   "lines": [
+    "First, my own numbers. My first Short got twenty eight views in about twelve hours.",
+    "Episode one, the long video, got eleven."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "average viewed on my Short",
+   "value": "41.7%",
+   "sub": "about 25 of 60 seconds",
+   "color": "acc",
+   "lines": [
+    "On average, people watched forty one point seven percent of that Short.",
+    "About twenty five seconds out of sixty."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "What YouTube says shapes recommendations",
+   "items": [
+    {
+     "text": "Watch and search history",
+     "line": 1
+    },
+    {
+     "text": "Subscriptions",
+     "line": 1
+    },
+    {
+     "text": "Likes",
+     "line": 1
+    },
+    {
+     "text": "Satisfaction surveys",
+     "line": 2,
+     "mark": "check",
+     "color": "acc"
+    },
+    {
+     "text": "Dislikes",
+     "line": 3,
+     "mark": "x"
+    },
+    {
+     "text": "Not interested / Don't recommend",
+     "line": 3,
+     "mark": "x"
+    }
+   ],
+   "lines": [
+    "YouTube's help page lists what shapes recommendations.",
+    "What you watch and search, who you subscribe to, and what you like.",
+    "Surveys that ask whether you were satisfied.",
+    "And dislikes, not interested, and don't recommend channel push videos away."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Comments aren't on that list.",
+   "sub": "YouTube's help page doesn't mention them",
+   "color": "amb",
+   "lines": [
+    "Here's the surprise. That page doesn't mention comments at all."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "What counts as a view now",
+   "log": [
+    [
+     "view: counts from the first frame",
+     "fg"
+    ],
+    [
+     "  (even autoplay in a feed)",
+     "dim"
+    ],
+    [
+     "engaged view: keeps watching",
+     "acc"
+    ],
+    [
+     "  past the first few seconds",
+     "dim"
+    ],
+    [
+     "earnings eligibility: engaged views",
+     "amb"
+    ]
+   ],
+   "lines": [
+    "Views changed too. Since late August, a view counts from the very first frame, even on autoplay.",
+    "An engaged view means someone kept watching past the first few seconds.",
+    "And engaged views are what count toward earning money."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Does commenting help?",
+   "sub": "Me: yes. This video came from one word.",
+   "color": "acc",
+   "lines": [
+    "So does commenting help? For the algorithm, YouTube's page doesn't say.",
+    "For me, yes. This whole video came from one word. Leave one, and it might become day three."
+   ]
+  }
+ ]
+}
