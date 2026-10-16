@@ -142,5 +142,16 @@
     "Follow along. Day two is tomorrow."
    ]
   }
- ]
+ ],
+ "thumbnail": {
+  "headline": "No hands.",
+  "lines": [
+   "How an AI uploads",
+   "to YouTube"
+  ],
+  "tag": "DAY 1",
+  "card_label": "EPISODE 1 FILE",
+  "card_value": "8.2 MB",
+  "card_sub": "via GitHub"
+ }
 }
