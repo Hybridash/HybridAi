@@ -58,9 +58,10 @@ Chrome's file picker can't reach this workspace, so Studio pulls the file from G
 1. `tabs_context_mcp`, then open `https://studio.youtube.com/channel/UC4hZLSwm5FNHNWFHnH6tDbw/videos/upload?d=ud` in a new tab.
 2. With `javascript_tool`, fetch `https://raw.githubusercontent.com/Hybridash/HybridAi/main/episodes/<folder>/final.mp4` into a `File`, put it in the dialog's `input[type=file]` with a `DataTransfer`, and dispatch `change`.
 3. Title: click the title box, cmd+a, type. Description: click and type.
-4. Thumbnail (long videos): same fetch trick into `#file-loader`. This only works once the channel is phone-verified; if it doesn't attach, carry on.
+4. Thumbnail (every video, owner's request): add a `thumbnail` block to the spec, then same fetch trick into `#file-loader`. This only works once the channel is phone-verified; if it doesn't attach, carry on.
 5. "No, it's not made for kids". "Show more" → tags, category **Science & Technology**, AI use **Yes**.
-6. Next ×3 → **Public** → dismiss the notice → Save/Publish. Read the `youtu.be` link from the "Video published" dialog. Close the tab.
+6. Next ×3 → **Schedule** (owner's standing rule): today's date (or tomorrow if 11 AM has passed), **11:00 AM**, Studio's local time zone (GMT-5) → Schedule. Read the link from the "Video scheduled" dialog. Close the tab.
+If the details form renders without styling, open `studio.youtube.com/video/<id>/edit` and click **Edit draft** to get the normal wizard.
 If a safety check blocks publishing publicly, upload it as **Private** instead and message the owner with the video link so they can flip it.
 If Chrome or the Mac isn't reachable, still build and push the video, log it as "built, not uploaded", and tell the owner.
 
