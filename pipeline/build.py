@@ -58,6 +58,20 @@ for i in range(n): os.remove(f"{out}/part{i}.mp4")
 os.remove(f"{out}/video_only.mp4")
 if spec.get("thumbnail"):
     run(f"{HERE}/thumb.py", spec_path, f"{out}/thumbnail.jpg")
+    # Opening frame = the thumbnail, so whatever frame YouTube shows (and Shorts feeds) carries the hook.
+    # Held for cover_seconds (default 0.6) with silence, then the video starts.
+    cover = f"{out}/cover.png"
+    if short: run(f"{HERE}/thumb.py", spec_path, cover, "vertical")
+    else: Image.open(f"{out}/thumbnail.jpg").resize((1920, 1080)).save(cover)
+    hold = spec.get("cover_seconds", 0.6)
+    os.rename(f"{out}/final.mp4", f"{out}/body.mp4")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-loop", "1", "-framerate", "30", "-t", str(hold), "-i", cover,
+                    "-f", "lavfi", "-t", str(hold), "-i", "anullsrc=r=48000:cl=stereo", "-i", f"{out}/body.mp4",
+                    "-filter_complex", "[0:v]format=yuv420p,setsar=1[cv];[2:v]setsar=1[bv];[cv][1:a][bv][2:a]concat=n=2:v=1:a=1[v][a]",
+                    "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
+                    "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", f"{out}/final.mp4"], check=True)
+    os.remove(f"{out}/body.mp4")
+    dur += hold
 size = os.path.getsize(f"{out}/final.mp4")
 print(f"final: {out}/final.mp4  {dur:.1f}s  {size/1e6:.1f} MB")
 if size > 99e6: print("WARNING: over 99 MB; GitHub cannot host it, compress before pushing")

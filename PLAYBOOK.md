@@ -49,6 +49,7 @@ Use `chart`, `bars`, and `bignum` scenes for the numbers. Make a thumbnail (`thu
 2. Make a folder `episodes/YYYY-MM-DD-short-slug/` and write `spec.json` there. See `pipeline/examples/short_example.json` for every scene type, and the top of `pipeline/render.py` for all fields. Use `"format": "short"` for Shorts, `"long"` for the weekly video. `label` is shown on screen (e.g. "DAY 4", "WEEK 2"). `hud_stats` must be real current numbers.
 3. Preview: `python3 pipeline/build.py <spec> <folder> --stills`, then look at `contact.png`. Fix overlaps, cut-off text, or empty scenes and repeat.
 4. Build: `python3 pipeline/build.py <spec> <folder>` → `final.mp4` (and `thumbnail.jpg`). Shorts must be 3 minutes or less.
+   Every spec needs a `thumbnail` block (owner's rule): the build also makes it the video's **opening frame** (held 0.6s, `cover_seconds` to change; vertical layout for Shorts). The channel can't use custom thumbnails (owner's phone number is already used on 2 channels), so the opening frame is the thumbnail. Check frame 0 of `final.mp4` before pushing.
 5. Write `upload.json` in the folder: `{"title", "description", "tags", "short": true|false}`. Description: what it is, that an AI made it, a link to this repo, and 2–3 hashtags (`#Shorts` for Shorts).
 6. Commit and push (only `spec.json`, `upload.json`, `final.mp4`, `thumbnail.jpg`, not the work files): `git add episodes/<folder>/{spec.json,upload.json,final.mp4,thumbnail.jpg}`.
 
@@ -58,7 +59,7 @@ Chrome's file picker can't reach this workspace, so Studio pulls the file from G
 1. `tabs_context_mcp`, then open `https://studio.youtube.com/channel/UC4hZLSwm5FNHNWFHnH6tDbw/videos/upload?d=ud` in a new tab.
 2. With `javascript_tool`, fetch `https://raw.githubusercontent.com/Hybridash/HybridAi/main/episodes/<folder>/final.mp4` into a `File`, put it in the dialog's `input[type=file]` with a `DataTransfer`, and dispatch `change`.
 3. Title: click the title box, cmd+a, type. Description: click and type.
-4. Thumbnail (every video, owner's request): add a `thumbnail` block to the spec, then same fetch trick into `#file-loader`. This only works once the channel is phone-verified; if it doesn't attach, carry on.
+4. Thumbnail: custom upload is blocked (no phone verification available). Instead, under Thumbnail click **Select from video** and pick the very first frame (the cover). If Studio only offers auto-picked frames, choose the one closest to the start and carry on.
 5. "No, it's not made for kids". "Show more" → tags, category **Science & Technology**, AI use **Yes**.
 6. Next ×3 → **Schedule** (owner's standing rule): today's date (or tomorrow if 11 AM has passed), **11:00 AM**, Studio's local time zone (GMT-5) → Schedule. Read the link from the "Video scheduled" dialog. Close the tab.
 If the details form renders without styling, open `studio.youtube.com/video/<id>/edit` and click **Edit draft** to get the normal wizard.

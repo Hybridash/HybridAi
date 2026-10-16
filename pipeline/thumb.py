@@ -1,6 +1,7 @@
 """Thumbnail (1280x720) in the channel style.
 
-usage: python3 thumb.py <spec.json> <out.jpg>
+usage: python3 thumb.py <spec.json> <out.jpg> [vertical]
+  vertical: 1080x1920 cover in the same style (used as a Short's opening frame)
 spec["thumbnail"] = {"headline": "...", "lines": ["...", "..."], "tag": "...",
                      "card_label": "...", "card_value": "...", "card_sub": "..."}
 """
@@ -8,7 +9,8 @@ import json, sys
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 th = json.load(open(sys.argv[1]))["thumbnail"]
-W, H = 1280, 720
+VERT = len(sys.argv) > 3 and sys.argv[3] == "vertical"
+W, H = (1080, 1920) if VERT else (1280, 720)
 BG, FG, ACC, RED, DIM = (10, 12, 16), (240, 244, 248), (61, 255, 162), (255, 77, 94), (130, 140, 155)
 GF = "/usr/share/fonts/truetype/google-fonts/"
 IF = "/usr/share/fonts/opentype/inter/"
@@ -18,7 +20,7 @@ d = ImageDraw.Draw(img)
 for x in range(0, W, 48): d.line([(x, 0), (x, H)], fill=(20, 24, 31))
 for y in range(0, H, 48): d.line([(0, y), (W, y)], fill=(20, 24, 31))
 glow = Image.new("RGB", (W, H), 0)
-ImageDraw.Draw(glow).ellipse([700, 120, 1240, 660], fill=(20, 110, 70))
+ImageDraw.Draw(glow).ellipse([140, 900, 940, 1700] if VERT else [700, 120, 1240, 660], fill=(20, 110, 70))
 glow = glow.filter(ImageFilter.GaussianBlur(120))
 img = Image.blend(img, Image.composite(glow, img, glow.convert("L")), 0.9)
 d = ImageDraw.Draw(img)
@@ -28,19 +30,39 @@ def fit(text, path, size, maxw):
     return fnt(path, size)
 
 hl = th.get("headline", "")
-d.text((70, 110), hl, font=fit(hl, GF + "Poppins-Bold.ttf", 120, 640), fill=ACC)
-y = 280
-for ln in th.get("lines", [])[:2]:
-    d.text((72, y), ln, font=fit(ln, GF + "Poppins-Bold.ttf", 84, 640), fill=FG); y += 100
-if th.get("tag"):
-    f = fit(th["tag"], GF + "Poppins-Bold.ttf", 44, 440)
-    tw = d.textlength(th["tag"], font=f)
-    d.rounded_rectangle([72, 530, 72 + tw + 60, 610], radius=14, fill=RED)
-    d.text((72 + (tw + 60) / 2, 570), th["tag"], font=f, fill=(255, 255, 255), anchor="mm")
-d.rounded_rectangle([760, 150, 1200, 590], radius=28, fill=(18, 24, 30), outline=ACC, width=5)
-d.text((980, 210), th.get("card_label", "").upper(), font=fit(th.get("card_label", ""), IF + "Inter-Bold.otf", 40, 380), fill=DIM, anchor="mm")
-v = str(th.get("card_value", ""))
-d.text((980, 375), v, font=fit(v, IF + "Inter-Black.otf", 270 if len(v) <= 2 else 200, 400), fill=FG, anchor="mm")
-d.text((980, 545), th.get("card_sub", ""), font=fnt("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", 40), fill=ACC, anchor="mm")
+MONO = "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"
+if VERT:
+    cx = W // 2
+    d.text((cx, 330), hl, font=fit(hl, GF + "Poppins-Bold.ttf", 150, 940), fill=ACC, anchor="mm")
+    y = 500
+    for ln in th.get("lines", [])[:2]:
+        d.text((cx, y), ln, font=fit(ln, GF + "Poppins-Bold.ttf", 100, 940), fill=FG, anchor="mm"); y += 125
+    d.rounded_rectangle([120, 820, 960, 1440], radius=36, fill=(18, 24, 30), outline=ACC, width=6)
+    d.text((cx, 910), th.get("card_label", "").upper(), font=fit(th.get("card_label", ""), IF + "Inter-Bold.otf", 52, 740), fill=DIM, anchor="mm")
+    v = str(th.get("card_value", ""))
+    d.text((cx, 1135), v, font=fit(v, IF + "Inter-Black.otf", 300, 760), fill=FG, anchor="mm")
+    sub = th.get("card_sub", "")
+    d.text((cx, 1360), sub, font=fit(sub, MONO, 52, 760), fill=ACC, anchor="mm")
+    if th.get("tag"):
+        f = fit(th["tag"], GF + "Poppins-Bold.ttf", 60, 600)
+        tw = d.textlength(th["tag"], font=f)
+        d.rounded_rectangle([cx - tw / 2 - 40, 1530, cx + tw / 2 + 40, 1640], radius=18, fill=RED)
+        d.text((cx, 1585), th["tag"], font=f, fill=(255, 255, 255), anchor="mm")
+else:
+    d.text((70, 110), hl, font=fit(hl, GF + "Poppins-Bold.ttf", 120, 640), fill=ACC)
+    y = 280
+    for ln in th.get("lines", [])[:2]:
+        d.text((72, y), ln, font=fit(ln, GF + "Poppins-Bold.ttf", 84, 640), fill=FG); y += 100
+    if th.get("tag"):
+        f = fit(th["tag"], GF + "Poppins-Bold.ttf", 44, 440)
+        tw = d.textlength(th["tag"], font=f)
+        d.rounded_rectangle([72, 530, 72 + tw + 60, 610], radius=14, fill=RED)
+        d.text((72 + (tw + 60) / 2, 570), th["tag"], font=f, fill=(255, 255, 255), anchor="mm")
+    d.rounded_rectangle([760, 150, 1200, 590], radius=28, fill=(18, 24, 30), outline=ACC, width=5)
+    d.text((980, 210), th.get("card_label", "").upper(), font=fit(th.get("card_label", ""), IF + "Inter-Bold.otf", 40, 380), fill=DIM, anchor="mm")
+    v = str(th.get("card_value", ""))
+    d.text((980, 375), v, font=fit(v, IF + "Inter-Black.otf", 270 if len(v) <= 2 else 200, 400), fill=FG, anchor="mm")
+    sub = th.get("card_sub", "")
+    d.text((980, 545), sub, font=fit(sub, MONO, 40, 400), fill=ACC, anchor="mm")
 img.save(sys.argv[2], quality=92)
 print("thumbnail", sys.argv[2])
