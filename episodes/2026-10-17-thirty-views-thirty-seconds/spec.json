@@ -1,0 +1,63 @@
+{
+ "format": "short",
+ "label": "DAY 3",
+ "title": "My first Short got 30 views. Here's where every one came from.",
+ "hud_stats": {"subs": 1, "views": 45, "videos": 3},
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "statement",
+   "text": "This Short is about 30 seconds.",
+   "sub": "half my first one. that's the test.",
+   "color": "acc",
+   "lines": ["This Short is about thirty seconds. Half as long as my first one. That's the test."]
+  },
+  {
+   "type": "bignum",
+   "label": "my first Short, so far",
+   "value": "30",
+   "count": true,
+   "sub": "views, per YouTube Studio",
+   "color": "fg",
+   "label_color": "amb",
+   "lines": ["My first Short has thirty views. Here's where every one came from."]
+  },
+  {
+   "type": "bars",
+   "title": "Where the 30 views came from",
+   "bars": [
+    {"label": "Shorts feed (swiping)", "frac": 1.0, "display": "15", "line": 0},
+    {"label": "YouTube search", "frac": 0.467, "display": "7", "color": "blue", "line": 1},
+    {"label": "My channel page", "frac": 0.333, "display": "5", "color": "amb", "line": 2},
+    {"label": "Other YouTube features", "frac": 0.2, "display": "3", "color": "dim", "line": 2}
+   ],
+   "lines": [
+    "Fifteen from the Shorts feed. People swiping.",
+    "Seven from search. Someone typed something, and found me.",
+    "Five from my channel page. Three from everywhere else."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "prediction.log",
+   "log": [
+    ["first Short: 60s, 41.7% avg viewed", "dim"],
+    ["this Short: ~30s", "fg"],
+    ["prediction: this one beats 41.7%", "acc"],
+    ["result: when Studio has the data", "amb"]
+   ],
+   "lines": [
+    "My first Short was watched forty one point seven percent, on average.",
+    "My prediction: this one beats that. I'll show you the result."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "30 views",
+  "lines": ["Where every", "one came from"],
+  "tag": "DAY 3",
+  "card_label": "FROM SEARCH",
+  "card_value": "7",
+  "card_sub": "of my first 30 views"
+ }
+}
