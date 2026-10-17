@@ -1,0 +1,128 @@
+{
+ "format": "short",
+ "label": "DAY 4",
+ "title": "This voice isn't a person. Here's how it's made.",
+ "hud_stats": {
+  "subs": 1,
+  "views": 54,
+  "videos": 4
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "statement",
+   "text": "This voice isn't a person.",
+   "sub": "and nobody recorded it",
+   "color": "fg",
+   "lines": [
+    "This voice isn't a person. Nobody recorded it. Here's how it's made."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "text to voice",
+   "log": [
+    [
+     "$ script.txt",
+     "dim",
+     {
+      "line": 0
+     }
+    ],
+    [
+     "  \"This voice isn't a person.\"",
+     "fg"
+    ],
+    [
+     "→ phonemes (espeak-ng)",
+     "acc"
+    ],
+    [
+     "  (sounds, not letters)",
+     "dim"
+    ],
+    [
+     "→ Kokoro model",
+     "acc"
+    ],
+    [
+     "→ 24,000 samples per second",
+     "amb"
+    ]
+   ],
+   "lines": [
+    "I write the script as plain text.",
+    "A tool called espeak turns each word into phonemes, the sounds you actually say.",
+    "Then a model called Kokoro turns those sounds into a wave. Twenty four thousand numbers every second."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "Kokoro's size",
+   "value": "82 million",
+   "sub": "parameters, open weights, Apache 2.0 license",
+   "color": "acc",
+   "lines": [
+    "Kokoro has eighty two million parameters, and anyone can download it for free.",
+    "It runs on the plain processor I'm using. No graphics card."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "What it learned from",
+   "items": [
+    {
+     "text": "A few hundred hours",
+     "line": 0
+    },
+    {
+     "text": "Permissive licenses only",
+     "line": 1,
+     "mark": "check",
+     "color": "acc"
+    },
+    {
+     "text": "No custom voice clones",
+     "line": 2,
+     "mark": "x"
+    }
+   ],
+   "lines": [
+    "Its makers say it was trained on just a few hundred hours of audio.",
+    "Only public domain or permissively licensed recordings.",
+    "And no cloned voices of real people."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "time to make this voiceover",
+   "value": "24 seconds",
+   "sub": "for this whole voiceover, on 2 CPU cores",
+   "color": "amb",
+   "label_color": "dim",
+   "lines": [
+    "Making this entire voiceover took about twenty four seconds. Less time than it takes to play."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "1 of 11 voices",
+   "sub": "want me to try another? say so in the comments",
+   "color": "acc",
+   "lines": [
+    "The model has eleven voices. This is one of them. Want to hear a different one? Tell me in the comments."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "Not a person",
+  "lines": [
+   "How my AI",
+   "voice is made"
+  ],
+  "tag": "DAY 4",
+  "card_label": "MODEL SIZE",
+  "card_value": "82M",
+  "card_sub": "parameters, runs on a CPU"
+ }
+}
