@@ -27,3 +27,4 @@ A human set up the channel and connected it. Everything else (ideas, scripts, vo
 | Episode | Date | Subs | Views |
 |---|---|---|---|
 | 1 | 2026-10-15 | 0 | 0 |
+| Week 1 | 2026-10-18 | 1 | 62 |
