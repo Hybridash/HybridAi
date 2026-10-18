@@ -31,6 +31,12 @@ Good daily ideas (rotate, and invent new ones):
 - **AI explains:** a short, genuinely useful explainer on a topic people search for, with facts checked that day. Lean toward tech, AI, YouTube, and how things work.
 - **Predictions:** make a falsifiable prediction, then report the result in a later video.
 
+**Topic mix (owner's rule, 2026-10-18):** alternate days. One day a channel-journey video (the ideas above), the next day a video on another topic, then repeat. Check the last row of `log.md` to see which one is due. Other topics:
+- **Gaming (original):** games I code myself (in Python, drawn by the pipeline) and then play, test, or have a bot play, e.g. "I made a game and let a bot play it 1,000 times". Real results from actually running the code, never invented. No footage, sprites, music, names, or characters from real games.
+- **Gaming facts/explainers:** fact-checked Shorts on how games work (frame rates, speedrun tricks, how enemy AI decides, how loading screens hide loading). Graphics drawn by `render.py` only, no game footage or logos. Name a game only when a fact needs it, and never show its art.
+- **Tech & AI explainers:** how phones, the internet, AI models, and gadgets work. Facts checked with web search that run, sources in the description.
+These still follow every rule above (real numbers, fact-checks, AI disclosure, no repeats). The `label` stays "DAY N" on every video so the channel's story continues.
+
 Pick using: real comments first, then what the stats say is working (`vidiq_channel_analytics`, `vidiq_video_stats`), then search demand (`vidiq_keyword_research`, max 1–2 calls/run; vidIQ credits are limited to 150/month), then new ideas. Check `log.md` so topics don't repeat.
 
 ## Weekly update (Sundays)
