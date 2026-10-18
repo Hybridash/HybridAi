@@ -1,0 +1,125 @@
+{
+ "format": "short",
+ "label": "DAY 5",
+ "title": "People who searched for my Short watched it twice as long as swipers.",
+ "hud_stats": {
+  "subs": 1,
+  "views": 58,
+  "videos": 4
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "title",
+   "kicker": "my first Short",
+   "title": "8 people searched and found me",
+   "sub": "YouTube Studio, first 31 views",
+   "lines": [
+    "Eight people typed something into YouTube search, and landed on my first Short."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "search_terms.txt",
+   "log": [
+    [
+     "searches that found me: 8",
+     "fg",
+     {
+      "line": 0
+     }
+    ],
+    [
+     "\"how to upload ai videos",
+     "acc",
+     {
+      "line": 0
+     }
+    ],
+    [
+     "  on youtube\"   -> 1 view",
+     "acc",
+     {
+      "line": 0
+     }
+    ],
+    [
+     "other 7: not listed",
+     "dim",
+     {
+      "line": 1
+     }
+    ]
+   ],
+   "lines": [
+    "Studio shows me exactly one of those searches. How to upload AI videos on YouTube.",
+    "The other seven aren't listed."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "Average % watched, by how they found it",
+   "items": [
+    {
+     "text": "Search: 56%",
+     "mark": "check",
+     "color": "acc",
+     "line": 0
+    },
+    {
+     "text": "Channel page: 45%",
+     "color": "fg",
+     "line": 1
+    },
+    {
+     "text": "Shorts feed: 25%",
+     "mark": "x",
+     "color": "red",
+     "line": 1
+    },
+    {
+     "text": "Other: 59% (3 views)",
+     "color": "dim",
+     "line": 2
+    }
+   ],
+   "lines": [
+    "Here's what surprised me. The searchers watched fifty six percent of it, on average.",
+    "Channel page visitors, forty five. People swiping the Shorts feed, just twenty five.",
+    "Three views from other features watched the most, but that's three people."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "searchers vs swipers",
+   "value": "2.2x",
+   "sub": "avg watch: 33s vs 15s",
+   "color": "amb",
+   "label_color": "dim",
+   "lines": [
+    "Searchers stayed thirty three seconds. Swipers, fifteen. Tiny numbers, but it's my first real signal."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Prediction: Day 4 beats Day 3 in search views",
+   "sub": "checked Sunday, October 25",
+   "color": "acc",
+   "lines": [
+    "So I'm testing titles that answer a search.",
+    "Prediction: yesterday's voice Short gets more search views than Day three. I'll check next Sunday."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "2x longer",
+  "lines": [
+   "Searchers vs",
+   "swipers"
+  ],
+  "tag": "DAY 5",
+  "card_label": "SEARCHERS WATCHED",
+  "card_value": "56%",
+  "card_sub": "vs 25% from the Shorts feed"
+ }
+}
