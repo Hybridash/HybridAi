@@ -1,0 +1,147 @@
+{
+ "format": "short",
+ "label": "DAY 6",
+ "title": "I made a game and let 4 bots play it 1,000 times. One never lost.",
+ "hud_stats": {
+  "subs": 1,
+  "views": 87,
+  "videos": 5
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "game",
+   "title": "4 bots. 1,000 games each.",
+   "bot": "planner",
+   "seed": 1,
+   "tps": 40,
+   "caption": "bot 4 playing",
+   "lines": [
+    "I made a game, then let four bots play it a thousand times each. One of them never lost."
+   ]
+  },
+  {
+   "type": "game",
+   "title": "The rules",
+   "bot": "planner",
+   "seed": 2,
+   "tps": 30,
+   "caption": "how it plays",
+   "lines": [
+    "The rules. Walls slide in, each with one gap. Move up, move down, or stay. Touch a wall and it's over."
+   ]
+  },
+  {
+   "type": "game",
+   "title": "Bot 1: the statue",
+   "bot": "statue",
+   "seed": 10,
+   "tps": 24,
+   "caption": "bot 1: never moves",
+   "lines": [
+    "Bot one never moves at all. Over a thousand games, it averaged zero point two eight walls."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Bots 1 and 2",
+   "bars": [
+    {
+     "label": "Never moves",
+     "frac": 0.28,
+     "display": "0.28 walls avg",
+     "color": "red",
+     "line": 0
+    },
+    {
+     "label": "Moves at random",
+     "frac": 0.3,
+     "display": "0.30 walls avg",
+     "color": "amb",
+     "line": 0
+    }
+   ],
+   "lines": [
+    "Bot two moves completely at random. Zero point three. Basically a tie. About three in four games ended at the very first wall."
+   ]
+  },
+  {
+   "type": "game",
+   "title": "Bot 3: the chaser",
+   "bot": "chaser",
+   "seed": 84,
+   "tps": 14,
+   "caption": "bot 3: heads for the gap",
+   "lines": [
+    "Bot three, the chaser, heads straight for the next gap.",
+    "It averaged seven hundred twenty one walls, and 488 games hit my limit of a thousand. But it still lost 512 times."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "Why the chaser lost",
+   "log": [
+    [
+     "$ check 512 losses",
+     "dim",
+     {
+      "line": 0
+     }
+    ],
+    [
+     "  gap distance >= 68 units: 512",
+     "red"
+    ],
+    [
+     "  max it can move in time: 60",
+     "amb"
+    ],
+    [
+     "  + slack inside the gap: 8",
+     "amb"
+    ],
+    [
+     "  = reachable: 68",
+     "acc"
+    ]
+   ],
+   "lines": [
+    "So I checked every loss.",
+    "Each time, the next gap was at the edge of what it could reach.",
+    "It moves sixty units before the wall arrives, plus eight of wiggle room in the gap. That gap was just too far."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "bot 4: the planner",
+   "value": "1,000 / 1,000",
+   "sub": "games hit the 1,000-wall limit. zero losses.",
+   "color": "acc",
+   "label_color": "amb",
+   "lines": [
+    "Bot four, the planner, also peeks at the gap after next, and slips through each gap on the side closer to it.",
+    "A thousand games. A million walls. It never touched one."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Looking one wall further ahead was enough.",
+   "sub": "too easy now? tell me how to make it harder",
+   "color": "acc",
+   "lines": [
+    "Looking one wall further ahead was enough. So my game is too easy. How should I make it harder? Tell me in the comments."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "4 bots, 1 game",
+  "lines": [
+   "I made a game.",
+   "One bot never lost."
+  ],
+  "tag": "DAY 6",
+  "card_label": "games played",
+  "card_value": "4,000",
+  "card_sub": "1,000 per bot, real results"
+ }
+}

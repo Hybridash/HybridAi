@@ -12,6 +12,8 @@ Scene types (each scene also has "lines": the narration):
   terminal  title, log: [[text, color]]
   chart     title, x: [labels], y: [numbers], unit
   statement text, color, sub
+  game      title, bot, seed, tps (ticks/sec, default 30), tail (only replay the last N walls),
+            caption: replays a real game of games/gap_runner.py (Gap Runner), drawn live
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -273,7 +275,53 @@ def s_chart(d, sc, t):
     if sc.get("unit"):
         d.text((x0 - 40, y0), sc["unit"], font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="lt")
 
-DRAW = {"title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_games = {}
+def game_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _games:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import gap_runner as G
+        score, frames = G.play(sc["bot"], _r.Random(sc["seed"]), trace=True)
+        _games[k] = (G, score, frames)
+    return _games[k]
+
+def s_game(d, sc, t):
+    G, score, frames = game_trace(sc)
+    y = head(d, sc, t, TOP)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    tail = sc.get("tail")
+    i0 = max(0, len(frames) - tail * G.SPACING) if tail else 0
+    tps = sc.get("tps", 30)
+    i = i0 + int(max(0.0, t - sc["_start"] - 0.3) * tps)
+    died = score < G.MAX_WALLS
+    i = min(i, len(frames) - 1)
+    py_, tw, g0, g1, sc_now = frames[i]
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    y0, y1 = y + 60 * K, BOT - 10
+    card(d, (x0, y0, x1, y1), EDGE, (13, 16, 21), a, r=18, w=2)
+    fy = lambda v: y0 + 10 + (y1 - y0 - 20) * (1 - v / G.FIELD)
+    px = x0 + (x1 - x0) * 0.2
+    ppt = (x1 - x0) * 0.75 / G.SPACING  # pixels per tick
+    ww = 34
+    for ticks, gc in ((tw, g0), (tw + G.SPACING, g1)):
+        wx = px + ticks * ppt
+        if wx - ww / 2 > x1 - 6: continue
+        lo, hi = fy(gc + G.GAP / 2), fy(gc - G.GAP / 2)
+        xa, xb = max(x0 + 6, wx - ww / 2), min(x1 - 6, wx + ww / 2)
+        if xb <= xa: continue
+        d.rectangle([xa, y0 + 6, xb, lo], fill=rgba(COL["blue"], a))
+        d.rectangle([xa, hi, xb, y1 - 6], fill=rgba(COL["blue"], a))
+    end = died and i == len(frames) - 1
+    rr = (y1 - y0 - 20) * G.R / G.FIELD * 1.6
+    c = RED if end else ACC
+    d.ellipse([px - rr, fy(py_) - rr, px + rr, fy(py_) + rr], fill=rgba(c, a))
+    d.text((x0, y0 - 14), sc.get("caption", sc["bot"]).upper(), font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="lb")
+    d.text((x1, y0 - 14), f"WALLS {sc_now}", font=F("monob", 34 * K), fill=rgba(c, a), anchor="rb")
+    if end:
+        d.text((CX, (y0 + y1) / 2), "HIT", font=F("black", 120 * K), fill=rgba(RED, a), anchor="mm")
+
+DRAW = {"game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):
