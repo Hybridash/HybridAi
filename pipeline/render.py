@@ -12,6 +12,8 @@ Scene types (each scene also has "lines": the narration):
   terminal  title, log: [[text, color]]
   chart     title, x: [labels], y: [numbers], unit
   statement text, color, sub
+  search    title, queries: [{q, note, line}], result: the YouTube search bar types each query
+            in turn; earlier ones stack below it with their note (e.g. a % share)
   game      title, bot, seed, tps (ticks/sec, default 30), tail (only replay the last N walls),
             caption: replays a real game of games/gap_runner.py (Gap Runner), drawn live
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
@@ -321,7 +323,47 @@ def s_game(d, sc, t):
     if end:
         d.text((CX, (y0 + y1) / 2), "HIT", font=F("black", 120 * K), fill=rgba(RED, a), anchor="mm")
 
-DRAW = {"game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+def s_search(d, sc, t):
+    y = head(d, sc, t, TOP)
+    a0 = ease((t - sc["_start"] + 0.1) / 0.4)
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    bh = 120 * K
+    card(d, (x0, y, x1, y + bh), FG, (16, 19, 26), a0, r=int(bh / 2), w=3)
+    # magnifier icon
+    mx, my, r = x0 + 70, y + bh / 2 - 6, 24 * K
+    d.ellipse([mx - r, my - r, mx + r, my + r], outline=rgba(DIM, a0), width=6)
+    d.line([(mx + r * 0.7, my + r * 0.7), (mx + r * 1.6, my + r * 1.6)], fill=rgba(DIM, a0), width=8)
+    qs = sc.get("queries", [])
+    times = reveal_times(sc, qs)
+    cur = max([k for k in range(len(qs)) if t >= times[k]], default=-1)
+    f = F("med", 52 * K)
+    tx = x0 + 130 * K
+    if cur >= 0:
+        q = qs[cur]["q"]
+        n = int(len(q) * min(1, (t - times[cur]) / 0.9))
+        d.text((tx, y + bh / 2), q[:n], font=f, fill=rgba(FG, a0), anchor="lm")
+        if int(t * 2) % 2 == 0 or n < len(q):
+            cx = tx + d.textlength(q[:n], font=f) + 6
+            d.line([(cx, y + bh / 2 - 32 * K), (cx, y + bh / 2 + 32 * K)], fill=rgba(ACC, a0), width=4)
+    else:
+        d.text((tx, y + bh / 2), "Search", font=f, fill=rgba(DIM, a0), anchor="lm")
+    # finished queries stack below
+    yy = y + bh + 50 * K
+    rowh = 105 * K
+    for k in range(len(qs)):
+        done = times[k] + 1.2
+        if t < done: continue
+        a = ease((t - done) / 0.35)
+        card(d, (x0, yy, x1, yy + rowh * 0.82), EDGE, CARD, a, w=2)
+        d.text((x0 + 40, yy + rowh * 0.41), qs[k]["q"], font=F("med", 44 * K), fill=rgba(FG, a), anchor="lm")
+        if qs[k].get("note"):
+            d.text((x1 - 40, yy + rowh * 0.41), qs[k]["note"], font=F("monob", 38 * K), fill=rgba(ACC, a), anchor="rm")
+        yy += rowh
+    if sc.get("result") and len(qs) and t >= times[-1] + 1.8:
+        a = ease((t - times[-1] - 1.8) / 0.4)
+        text_block(d, yy + 20 * K, sc["result"], F("med", 46 * K), DIM, a)
+
+DRAW = {"search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):
