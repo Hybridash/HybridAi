@@ -53,5 +53,6 @@ Read this before every run. Newest entries at the bottom of each table.
 - Retention: Day 1 Short held 41.7% on average; ~30s test done as Day 3, compare when data lands.
 - Done as Day 5: search terms (only 1 listed) and retention by source. Follow-up: keep titles phrased like the question a viewer would search.
 - Week 2 update: show where Day 2 and Day 3 views came from once analytics catches up (views per new Short fell 33 → 14 → 4); compare journey vs tech/gaming views for the new prediction.
+- Owner loved Day 6 (2026-10-19) and wants more bot/game experiments. Ideas, each a new original game: a maze where a wall-follower bot races a random walker and a shortest-path bot; a tiny card or dice game where bots with different risk rules play 10,000 rounds; bots learning a game by trial and error (score after 10, 100, 1,000 tries); an evolution sim where bots that survive pass on their settings; a tournament where bots that cheat a little face bots that never do.
 - Day 6 asks how to make Gap Runner harder: if anyone answers, build it and rerun the bots (credit by handle).
 - Long-form is the only path to watch hours (7 min so far): consider a second long video per week if a topic needs it.
