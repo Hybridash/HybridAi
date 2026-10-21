@@ -16,6 +16,8 @@ Scene types (each scene also has "lines": the narration):
             in turn; earlier ones stack below it with their note (e.g. a % share)
   game      title, bot, seed, tps (ticks/sec, default 30), tail (only replay the last N walls),
             caption: replays a real game of games/gap_runner.py (Gap Runner), drawn live
+  maze      title, bot (random|hand|memory), seed, loops, sps (steps/sec), trail, caption,
+            banner, banner_at: replays a real run of games/maze_bots.py (exit = green cell)
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -363,7 +365,67 @@ def s_search(d, sc, t):
         a = ease((t - times[-1] - 1.8) / 0.4)
         text_block(d, yy + 20 * K, sc["result"], F("med", 46 * K), DIM, a)
 
-DRAW = {"search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_mazes = {}
+def maze_trace(sc):
+    k = (sc["bot"], sc["seed"], bool(sc.get("loops")))
+    if k not in _mazes:
+        import os
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import maze_bots as M
+        _mazes[k] = (M,) + M.play(sc["bot"], sc["seed"], bool(sc.get("loops")))
+    return _mazes[k]
+
+def s_maze(d, sc, t):
+    M, mz, goal, steps, path = maze_trace(sc)
+    y = head(d, sc, t, TOP)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    side = min(CW, BOT - 10 - (y + 60 * K))
+    x0, y0 = CX - side / 2, y + 60 * K
+    cs = side / M.N
+    card(d, (x0 - 14, y0 - 14, x0 + side + 14, y0 + side + 14), EDGE, (13, 16, 21), a, r=14, w=2)
+    # exit cell
+    gx, gy = goal
+    d.rectangle([x0 + gx * cs + 6, y0 + gy * cs + 6, x0 + (gx + 1) * cs - 6, y0 + (gy + 1) * cs - 6], fill=rgba(ACC, a * 0.85))
+    # trail
+    sps = sc.get("sps", 10)
+    i = min(len(path) - 1, int(max(0.0, t - sc["_start"] - 0.4) * sps))
+    trail = sc.get("trail", 60)
+    lo = max(0, i - trail)
+    for j in range(lo, i):
+        (ax, ay), (bx, by) = path[j], path[j + 1]
+        f = (j - lo + 1) / max(1, i - lo)
+        d.line([(x0 + (ax + .5) * cs, y0 + (ay + .5) * cs), (x0 + (bx + .5) * cs, y0 + (by + .5) * cs)],
+               fill=rgba(COL["amb"], a * (0.15 + 0.6 * f)), width=int(cs * 0.22))
+    # walls
+    wc = rgba(FG, a)
+    lw = max(3, int(cs * 0.08))
+    for (cx, cy), op in mz.items():
+        px, py = x0 + cx * cs, y0 + cy * cs
+        if 0 not in op: d.line([(px, py), (px + cs, py)], fill=wc, width=lw)
+        if 3 not in op: d.line([(px, py), (px, py + cs)], fill=wc, width=lw)
+        if cx == M.N - 1: d.line([(px + cs, py), (px + cs, py + cs)], fill=wc, width=lw)
+        if cy == M.N - 1: d.line([(px, py + cs), (px + cs, py + cs)], fill=wc, width=lw)
+    done = steps is not None and i == len(path) - 1
+    bx, by = path[i]
+    rr = cs * 0.3
+    c = ACC if done else (COL["blue"])
+    d.ellipse([x0 + (bx + .5) * cs - rr, y0 + (by + .5) * cs - rr, x0 + (bx + .5) * cs + rr, y0 + (by + .5) * cs + rr], fill=rgba(c, a))
+    d.text((x0 - 14, y0 - 30), sc.get("caption", sc["bot"]).upper(), font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="lb")
+    stuck_now = steps is None and i == len(path) - 1
+    d.text((x0 + side + 14, y0 - 30), f"STEP {i:,}", font=F("monob", 34 * K), fill=rgba(RED if stuck_now else FG, a), anchor="rb")
+    if done:
+        f = F("black", 110 * K)
+        tw = d.textlength("OUT", font=f)
+        d.rounded_rectangle([CX - tw / 2 - 30, y0 + side / 2 - 80 * K, CX + tw / 2 + 30, y0 + side / 2 + 80 * K], radius=20, fill=rgba(BG, a * 0.85))
+        d.text((CX, y0 + side / 2), "OUT", font=f, fill=rgba(ACC, a), anchor="mm")
+    if sc.get("banner") and t >= sc["_start"] + sc.get("banner_at", 0):
+        ba = ease((t - sc["_start"] - sc.get("banner_at", 0)) / 0.4)
+        f = F("black", 110 * K)
+        tw = d.textlength(sc["banner"], font=f)
+        d.rounded_rectangle([CX - tw / 2 - 30, y0 + side / 2 - 80 * K, CX + tw / 2 + 30, y0 + side / 2 + 80 * K], radius=20, fill=rgba(BG, ba * 0.85))
+        d.text((CX, y0 + side / 2), sc["banner"], font=f, fill=rgba(RED, ba), anchor="mm")
+
+DRAW = {"maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):

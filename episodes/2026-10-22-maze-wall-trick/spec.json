@@ -1,0 +1,187 @@
+{
+ "format": "short",
+ "label": "DAY 8",
+ "title": "I let 3 bots solve 2,000 mazes. The famous wall trick got stuck 483 times.",
+ "hud_stats": {
+  "subs": 1,
+  "views": 213,
+  "videos": 8
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "maze",
+   "title": "Hand on the wall",
+   "bot": "hand",
+   "seed": 1,
+   "loops": true,
+   "sps": 14,
+   "trail": 50,
+   "caption": "right hand on the wall",
+   "banner": "STUCK",
+   "banner_at": 6.5,
+   "lines": [
+    "People say: keep one hand on the wall and you'll escape any maze. I tested it on a thousand mazes. In 483, it walked in circles forever."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "The setup",
+   "items": [
+    {
+     "text": "Bots only see nearby walls"
+    },
+    {
+     "text": "Exit: a random inside cell"
+    },
+    {
+     "text": "Bot 1: random moves"
+    },
+    {
+     "text": "Bot 2: hand on the wall"
+    },
+    {
+     "text": "Bot 3: remembers its path"
+    }
+   ],
+   "lines": [
+    "I coded a maze game. Each bot only sees the walls next to it, and the exit is somewhere inside.",
+    "Bot one moves at random. Bot two keeps its right hand on the wall. Bot three remembers where it's been, and backs up at dead ends."
+   ]
+  },
+  {
+   "type": "maze",
+   "title": "No loops",
+   "bot": "hand",
+   "seed": 9,
+   "loops": false,
+   "sps": 22,
+   "trail": 80,
+   "caption": "bot 2, no-loop maze",
+   "lines": [
+    "First, a thousand mazes with no loops."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Escaped: no loops",
+   "bars": [
+    {
+     "label": "Random",
+     "frac": 0.667,
+     "display": "667 / 1,000",
+     "color": "amb"
+    },
+    {
+     "label": "Hand on wall",
+     "frac": 1.0,
+     "display": "1,000 / 1,000",
+     "color": "acc"
+    },
+    {
+     "label": "Memory",
+     "frac": 1.0,
+     "display": "1,000 / 1,000",
+     "color": "acc"
+    }
+   ],
+   "lines": [
+    "Random escaped 667 times within my five thousand step limit. The wall trick and the memory bot escaped all thousand."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Then I added loops.",
+   "sub": "1,000 new mazes, 14 extra walls removed in each",
+   "color": "amb",
+   "lines": [
+    "Then, a thousand new mazes with 14 extra walls knocked out of each, so some paths loop."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Escaped: with loops",
+   "bars": [
+    {
+     "label": "Random",
+     "frac": 0.939,
+     "display": "939 / 1,000",
+     "color": "amb"
+    },
+    {
+     "label": "Hand on wall",
+     "frac": 0.517,
+     "display": "517 / 1,000",
+     "color": "red"
+    },
+    {
+     "label": "Memory",
+     "frac": 1.0,
+     "display": "1,000 / 1,000",
+     "color": "acc"
+    }
+   ],
+   "lines": [
+    "The wall trick fell to 517. Even the random bot beat it, with 939. Memory still escaped all thousand."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "Why it got stuck",
+   "log": [
+    [
+     "$ check 483 stuck runs",
+     "dim",
+     {
+      "line": 0
+     }
+    ],
+    [
+     "  times it touched the exit: 0",
+     "red"
+    ],
+    [
+     "  squares it kept circling: ~94 of 144",
+     "amb"
+    ]
+   ],
+   "lines": [
+    "In all 483 stuck runs, it never once touched the exit.",
+    "Loops can put the exit beside a ring of wall that isn't joined to the outside. The bot circles the outer wall and never reaches it."
+   ]
+  },
+  {
+   "type": "maze",
+   "title": "Same maze, bot 3",
+   "bot": "memory",
+   "seed": 1,
+   "loops": true,
+   "sps": 10,
+   "trail": 60,
+   "caption": "bot 3: remembers",
+   "lines": [
+    "Same maze where the wall trick got stuck. The memory bot got out in 39 steps."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "The trick only works when every wall connects.",
+   "sub": "what should these bots try next?",
+   "color": "acc",
+   "lines": [
+    "The trick only works when every wall connects to the outside. What should these bots try next? Tell me in the comments."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "The wall trick failed",
+  "lines": [
+   "3 bots, 2,000 mazes.",
+   "One got stuck 483 times."
+  ],
+  "tag": "DAY 8",
+  "card_label": "stuck forever",
+  "card_value": "483",
+  "card_sub": "of 1,000 mazes with loops"
+ }
+}
