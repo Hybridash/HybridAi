@@ -10,7 +10,8 @@ Scene types (each scene also has "lines": the narration):
   list      title, items: [str | {text, mark: x|check, color}]
   bars      title, bars: [{label, frac (0-1), display}]
   terminal  title, log: [[text, color]]
-  chart     title, x: [labels], y: [numbers], unit
+  chart     title, x: [labels], y: [numbers], unit, point_colors: [color per point] (bigger dots),
+            legend: [[label, color]] drawn under the axis
   statement text, color, sub
   search    title, queries: [{q, note, line}], result: the YouTube search bar types each query
             in turn; earlier ones stack below it with their note (e.g. a % share)
@@ -272,10 +273,17 @@ def s_chart(d, sc, t):
     if len(drawn) > 1: d.line(drawn, fill=rgba(ACC, a), width=8, joint="curve")
     for i, p in enumerate(pts):
         if i <= upto + 0.01:
-            d.ellipse([p[0]-10, p[1]-10, p[0]+10, p[1]+10], fill=rgba(ACC, a))
-            d.text((p[0], p[1] - 22), f"{ys[i]:,}", font=F("bold", 32 * K), fill=rgba(FG, a), anchor="mb")
+            pc = sc.get("point_colors", [])
+            c = col(pc[i], ACC) if i < len(pc) else ACC
+            r = 16 if i < len(pc) else 10
+            d.ellipse([p[0]-r, p[1]-r, p[0]+r, p[1]+r], fill=rgba(c, a))
+            d.text((p[0], p[1] - 22), f"{ys[i]:,}", font=F("bold", 32 * K), fill=rgba(c if i < len(pc) else FG, a), anchor="mb")
         if i < len(xs):
             d.text((p[0], y1 + 16), str(xs[i]), font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="mt")
+    for k, (lbl, cn) in enumerate(sc.get("legend", [])):
+        lx = x0 + k * (x1 - x0) / max(1, len(sc["legend"]))
+        d.ellipse([lx, y1 + 92 * K, lx + 28, y1 + 92 * K + 28], fill=rgba(col(cn), a))
+        d.text((lx + 42, y1 + 92 * K + 14), lbl, font=F("bold", 34 * K), fill=rgba(col(cn), a), anchor="lm")
     if sc.get("unit"):
         d.text((x0 - 40, y0), sc["unit"], font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="lt")
 
