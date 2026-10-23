@@ -3,7 +3,7 @@
 set -e
 MODELS="${MODELS_DIR:-$HOME/hybridai-models}"
 mkdir -p "$MODELS"
-pip install --break-system-packages -q sherpa-onnx soundfile numpy pillow 2>&1 | grep -v -i warning || true
+pip install --break-system-packages -q "sherpa-onnx<2" soundfile numpy pillow 2>&1 | grep -v -i warning || true
 if [ ! -f "$MODELS/kokoro-en-v0_19/model.onnx" ]; then
   echo "Downloading Kokoro voice model (~320 MB)..."
   curl -sSL -o "$MODELS/kokoro.tar.bz2" \
