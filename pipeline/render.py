@@ -19,6 +19,8 @@ Scene types (each scene also has "lines": the narration):
             caption: replays a real game of games/gap_runner.py (Gap Runner), drawn live
   maze      title, bot (random|hand|memory), seed, loops, sps (steps/sec), trail, caption,
             banner, banner_at: replays a real run of games/maze_bots.py (exit = green cell)
+  dice      title, bot, seed, rps (rolls/sec, default 1.2), caption: replays one real turn of
+            games/bust_dice.py (Bust Dice): dice land in a row, pot counts up, repeat = BUST
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -433,7 +435,63 @@ def s_maze(d, sc, t):
         d.rounded_rectangle([CX - tw / 2 - 30, y0 + side / 2 - 80 * K, CX + tw / 2 + 30, y0 + side / 2 + 80 * K], radius=20, fill=rgba(BG, ba * 0.85))
         d.text((CX, y0 + side / 2), sc["banner"], font=f, fill=rgba(RED, ba), anchor="mm")
 
-DRAW = {"maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_dice = {}
+def dice_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _dice:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import bust_dice as B
+        tr = []
+        v = B.turn(sc["bot"], _r.Random(sc["seed"]), trace=tr)
+        _dice[k] = (tr, v)
+    return _dice[k]
+
+PIPS = {1: [(0, 0)], 2: [(-1, -1), (1, 1)], 3: [(-1, -1), (0, 0), (1, 1)], 4: [(-1, -1), (1, -1), (-1, 1), (1, 1)],
+        5: [(-1, -1), (1, -1), (0, 0), (-1, 1), (1, 1)], 6: [(-1, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (1, 1)]}
+def die(d, cx, cy, size, v, c, a, fill=FG):
+    h = size / 2
+    d.rounded_rectangle([cx - h, cy - h, cx + h, cy + h], radius=int(size * 0.18), fill=rgba(fill, a), outline=rgba(c, a), width=8)
+    pr = size * 0.09
+    for px, py in PIPS[v]:
+        x, y = cx + px * size * 0.27, cy + py * size * 0.27
+        d.ellipse([x - pr, y - pr, x + pr, y + pr], fill=rgba(BG, a))
+
+def s_dice(d, sc, t):
+    rolls, banked = dice_trace(sc)
+    y = head(d, sc, t, TOP)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    y0, y1 = y + 60 * K, BOT - 10
+    card(d, (x0, y0, x1, y1), EDGE, (13, 16, 21), a, r=18, w=2)
+    d.text((x0, y0 - 14), sc.get("caption", sc["bot"]).upper(), font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="lb")
+    rps = sc.get("rps", 1.2)
+    el = max(0.0, t - sc["_start"] - 0.5) * rps
+    n = min(len(rolls), int(el) + (1 if el > 0 else 0))
+    bust = banked == 0
+    done = el >= len(rolls) + 0.3
+    # dice in two rows of up to 4
+    size = min((x1 - x0 - 100) / 4 - 24, (y1 - y0) * 0.26)
+    for k in range(n):
+        v = rolls[k]
+        lt = ease((el - k) / 0.35)
+        row, colk = divmod(k, 4)
+        cx = x0 + 50 + size / 2 + colk * (size + 24) + (x1 - x0 - 100 - 4 * size - 3 * 24) / 2
+        cy = y0 + 50 + size / 2 + row * (size + 30) - (1 - lt) * 60
+        rep = bust and k == len(rolls) - 1
+        die(d, cx, cy, size, v, RED if rep else (EDGE if not done else (RED if bust else ACC)), a * lt, fill=(255, 210, 215) if rep else FG)
+    pot = sum(rolls[:n]) if not (bust and n == len(rolls)) else sum(rolls[:n - 1])
+    py = y0 + 50 + 2 * (size + 30) + 30
+    ba = ease((el - len(rolls) - 0.3) / 0.4 * rps) if done else 0.0
+    pa = a * (1 - ba)
+    if pa > 0.02: d.text((x0 + 50, py), "POT", font=F("bold", 40 * K), fill=rgba(DIM, pa), anchor="lt")
+    if pa > 0.02: d.text((x1 - 50, py), str(pot), font=F("black", 110 * K), fill=rgba(FG, pa), anchor="rt")
+    if done:
+        txt = "BUST: 0" if bust else f"BANK {banked}"
+        f = F("black", 120 * K)
+        d.text((CX, py + 60 * K), txt, font=f, fill=rgba(RED if bust else ACC, ba * a), anchor="mm")
+
+DRAW = {"dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):

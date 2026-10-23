@@ -1,0 +1,64 @@
+{
+ "format": "short",
+ "label": "DAY 10",
+ "title": "I made a dice game for 6 bots. The one that never busts lost 73% of its games.",
+ "hud_stats": {"subs": 1, "views": 274, "videos": 10},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "dice", "title": "The safe bot", "bot": "once", "seed": 5, "rps": 1.2, "caption": "rolls once, always banks",
+   "lines": ["This bot never busts. It rolls once and banks. Out of fifty thousand games, it lost seventy three percent."]},
+  {"type": "list", "title": "My dice game", "items": [
+     {"text": "Roll as often as you want"},
+     {"text": "Each roll adds to your pot"},
+     {"text": "Roll a repeat number: BUST", "color": "red", "mark": "x"},
+     {"text": "Bank the pot any time"},
+     {"text": "First to 50 points wins", "color": "acc", "mark": "check"}],
+   "lines": ["I coded a dice game. Roll as many times as you like, and every roll adds to your pot.",
+             "Roll a number you already rolled this turn, and you lose the pot. Bank whenever you want. First to fifty wins."]},
+  {"type": "list", "title": "Six bots", "items": [
+     {"text": "Once: banks after 1 roll"},
+     {"text": "Twice: banks after 2 rolls"},
+     {"text": "Three: banks after 3 rolls"},
+     {"text": "Pot 12: rolls until pot is 12+"},
+     {"text": "Math: rolls if it pays on average"},
+     {"text": "Never: never banks", "color": "red"}],
+   "lines": ["Six bots. Three bank after one, two, or three rolls. One rolls until its pot hits twelve.",
+             "One does the math every roll. And one never banks at all. Every pair played ten thousand games."]},
+  {"type": "dice", "title": "The bot that never banks", "bot": "never", "seed": 7, "rps": 1.5, "caption": "never banks",
+   "lines": ["The never bot built a pot of sixteen here, then rolled a repeat and lost it. It won twenty three games out of fifty thousand."]},
+  {"type": "bars", "title": "Points per turn", "bars": [
+     {"label": "Math", "frac": 1.0, "display": "6.20  (busts 27.8%)", "color": "acc"},
+     {"label": "Twice", "frac": 0.942, "display": "5.84  (busts 16.5%)", "color": "blue"},
+     {"label": "Three", "frac": 0.939, "display": "5.82  (busts 44.5%)", "color": "amb"},
+     {"label": "Once", "frac": 0.563, "display": "3.49  (busts 0%)", "color": "fg"}],
+   "lines": ["Over a hundred thousand turns each, the bot that rolls three times busts almost half the time, and still scores as much as the one that rolls twice.",
+             "Never busting meant just three and a half points a turn."]},
+  {"type": "bars", "title": "Games won", "bars": [
+     {"label": "Math", "frac": 0.764, "display": "76.4%", "color": "acc"},
+     {"label": "Twice", "frac": 0.711, "display": "71.1%", "color": "blue"},
+     {"label": "Three", "frac": 0.697, "display": "69.7%", "color": "amb"},
+     {"label": "Pot 12", "frac": 0.559, "display": "55.9%", "color": "fg"},
+     {"label": "Once", "frac": 0.268, "display": "26.8%", "color": "red"},
+     {"label": "Never", "frac": 0.0005, "display": "0.05%", "color": "red"}],
+   "lines": ["In wins, the math bot came first with seventy six percent. The safe bot won just twenty seven. Only the never bot did worse."]},
+  {"type": "dice", "title": "The math bot", "bot": "math", "seed": 6, "rps": 1.2, "caption": "rolls only if it pays",
+   "lines": ["Here it rolls five, one, four. Pot of ten. Then it stops."]},
+  {"type": "terminal", "title": "Its one rule", "log": [
+     ["$ roll again?", "dim", {"line": 0}],
+     ["  gain: 2+3+6 = 11  (numbers not rolled yet)", "acc"],
+     ["  risk: 3 rolled x pot 10 = 30", "red"],
+     ["  11 < 30  -> bank 10", "amb", {"line": 1}]],
+   "lines": ["Its rule: add up the numbers you haven't rolled. That's the upside.",
+             "Compare it to how many numbers you've rolled, times the pot. If the risk is bigger, bank."]},
+  {"type": "statement", "text": "Never risking anything came second to last.", "sub": "what rule should I give the next bot?", "color": "amb",
+   "lines": ["Never risking anything came second to last. What rule should the next bot try? Tell me in the comments."]}
+ ],
+ "thumbnail": {
+  "headline": "The safe bot lost",
+  "lines": ["6 bots, one dice game.", "Never busting lost 73%."],
+  "tag": "DAY 10",
+  "card_label": "games lost",
+  "card_value": "73%",
+  "card_sub": "by the bot that never busts"
+ }
+}
