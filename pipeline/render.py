@@ -21,6 +21,9 @@ Scene types (each scene also has "lines": the narration):
             banner, banner_at: replays a real run of games/maze_bots.py (exit = green cell)
   dice      title, bot, seed, rps (rolls/sec, default 1.2), caption: replays one real turn of
             games/bust_dice.py (Bust Dice): dice land in a row, pot counts up, repeat = BUST
+  catch     title, bot (random|chaser|dodger|learner), seed, train (learner practice games, trained
+            with seed 12), tps (ticks/sec, default 4), from, upto (tick window), caption: replays a
+            real game of games/sky_catch.py (Sky Catch): coins and bombs fall, the player catches
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -491,7 +494,74 @@ def s_dice(d, sc, t):
         f = F("black", 120 * K)
         d.text((CX, py + 60 * K), txt, font=f, fill=rgba(RED if bust else ACC, ba * a), anchor="mm")
 
-DRAW = {"dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_catch = {}
+def catch_trace(sc):
+    k = (sc["bot"], sc["seed"], sc.get("train", 0))
+    if k not in _catch:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import sky_catch as S
+        Q = None
+        if sc["bot"] == "learner":
+            Q = {}; S.train(Q, sc.get("train", 0), _r.Random(12))
+        tr = []
+        S.play(sc["bot"], _r.Random(sc["seed"]), Q, tr)
+        _catch[k] = (S, tr)
+    return _catch[k]
+
+def s_catch(d, sc, t):
+    S, tr = catch_trace(sc)
+    y = head(d, sc, t, TOP)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    top = y + 60 * K
+    hgt = BOT - 70 * K - top
+    cs = min(CW / S.COLS, hgt / S.ROWS)
+    gw, gh = cs * S.COLS, cs * S.ROWS
+    x0, y0 = CX - gw / 2, top + (hgt - gh) / 2
+    card(d, (x0 - 14, y0 - 14, x0 + gw + 14, y0 + gh + 14), EDGE, (13, 16, 21), a, r=14, w=2)
+    for c in range(1, S.COLS):
+        d.line([(x0 + c * cs, y0), (x0 + c * cs, y0 + gh)], fill=rgba(GRID, a), width=2)
+    lo = sc.get("from", 0)
+    hi = min(len(tr) - 1, sc.get("upto", len(tr) - 1))
+    tps = sc.get("tps", 4)
+    el = lo + max(0.0, t - sc["_start"] - 0.4) * tps
+    i = min(hi, int(el))
+    f = 0.0 if i >= hi else el - i
+    grid, col, score, died, tick = tr[i]
+    ncol = tr[min(i + 1, hi)][1] if i < hi else col
+    mv = ease(min(1.0, f * 2.5))
+    pc = col + (ncol - col) * mv
+    fa = ease(min(1.0, f * 1.0))
+    for r in range(S.ROWS):
+        for c in range(S.COLS):
+            v = grid[r][c]
+            if v == S.EMPTY: continue
+            ry = r + fa if i < hi else r
+            cx, cy = x0 + (c + .5) * cs, y0 + (ry + .5) * cs
+            rr = cs * 0.3
+            if v == S.COIN:
+                d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=rgba(COL["amb"], a), outline=rgba((140, 100, 20), a), width=5)
+            else:
+                d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=rgba(RED, a))
+                q = rr * 0.45
+                d.line([(cx - q, cy - q), (cx + q, cy + q)], fill=rgba(BG, a), width=7)
+                d.line([(cx - q, cy + q), (cx + q, cy - q)], fill=rgba(BG, a), width=7)
+    end = i >= hi and hi == len(tr) - 1
+    boom = end and died
+    px = x0 + (pc + .5) * cs
+    py = y0 + (S.ROWS - 0.5) * cs
+    pw, ph = cs * 0.42, cs * 0.2
+    d.rounded_rectangle([px - pw, py - ph + cs * 0.15, px + pw, py + ph + cs * 0.15], radius=int(ph), fill=rgba(RED if boom else (COL["blue"]), a))
+    d.text((CX, y0 - 30), sc.get("caption", sc["bot"]).upper(), font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="mb")
+    d.text((x0 - 14, y0 + gh + 24), f"COINS {score}", font=F("monob", 34 * K), fill=rgba(COL["amb"], a), anchor="lt")
+    d.text((x0 + gw + 14, y0 + gh + 24), f"TICK {tick}", font=F("mono", 34 * K), fill=rgba(DIM, a), anchor="rt")
+    if boom:
+        fb = F("black", 110 * K)
+        tw = d.textlength("BOOM", font=fb)
+        d.rounded_rectangle([CX - tw / 2 - 30, y0 + gh / 2 - 80 * K, CX + tw / 2 + 30, y0 + gh / 2 + 80 * K], radius=20, fill=rgba(BG, a * 0.85))
+        d.text((CX, y0 + gh / 2), "BOOM", font=fb, fill=rgba(RED, a), anchor="mm")
+
+DRAW = {"catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):

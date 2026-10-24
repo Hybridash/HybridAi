@@ -1,0 +1,50 @@
+{
+ "format": "short",
+ "label": "DAY 12",
+ "title": "I let a bot learn my game from zero. After 10,000 games it beat every bot I wrote.",
+ "hud_stats": {"subs": 1, "views": 375, "videos": 12},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "catch", "title": "10,000 games of practice", "bot": "learner", "train": 10000, "seed": 4, "tps": 5, "from": 0, "upto": 40, "caption": "learner",
+   "lines": ["Nobody told this bot the rules. It started knowing nothing. After ten thousand practice games, it catches fifty one coins a game, and it never hits a bomb."]},
+  {"type": "list", "title": "My game: Sky Catch", "items": [
+     {"text": "Coins and bombs fall"},
+     {"text": "Move left, stay, or move right"},
+     {"text": "Catch a coin: +1", "color": "acc", "mark": "check"},
+     {"text": "Catch a bomb: game over", "color": "red", "mark": "x"},
+     {"text": "200 ticks per game"}],
+   "lines": ["I coded a little game. Coins and bombs fall down five lanes. Catch coins, avoid bombs, two hundred ticks a game."]},
+  {"type": "catch", "title": "My coin chaser", "bot": "chaser", "seed": 3, "tps": 5, "caption": "chases coins only",
+   "lines": ["First I wrote bots by hand. This one runs at the nearest coin. It never looks for bombs, so it lasts about thirty four ticks."]},
+  {"type": "bars", "title": "Bots I wrote: coins per game", "bars": [
+     {"label": "Dodger", "frac": 0.315, "display": "16.05  (bombed 0%)", "color": "blue"},
+     {"label": "Chaser", "frac": 0.168, "display": "8.59  (bombed 99.9%)", "color": "amb"},
+     {"label": "Random", "frac": 0.045, "display": "2.31  (bombed 99.9%)", "color": "red"}],
+   "lines": ["My best one just dodges. It stands still and steps aside when a bomb is coming. Sixteen coins a game, and it never dies."]},
+  {"type": "catch", "title": "After 10 games", "bot": "learner", "train": 10, "seed": 14, "tps": 5, "caption": "learner: 10 games",
+   "lines": ["Then the learner. It gets plus one for a coin and minus ten for a bomb, and nothing else. After ten games, it still walks into bombs."]},
+  {"type": "chart", "title": "Learner: coins per game", "x": ["0", "10", "100", "1k", "10k", "100k"], "y": [2.57, 5.61, 22.88, 43.17, 50.99, 48.09], "unit": "",
+   "point_colors": ["red", "red", "amb", "acc", "acc", "acc"], "legend": [["games of practice", "dim"]],
+   "lines": ["After a hundred games, twenty three coins. That already beats every bot I wrote.",
+             "After a thousand, forty three. At ten thousand, fifty one. A hundred thousand games didn't help: forty eight."]},
+  {"type": "terminal", "title": "What it can see", "log": [
+     ["$ learner --show-view", "dim", {"line": 0}],
+     ["  only a 3 x 3 patch above its head", "fg"],
+     ["  590 different patches seen", "amb", {"line": 1}],
+     ["  1 score per move in each one", "acc"],
+     ["  caught 61% of all coins", "acc", {"line": 2}]],
+   "lines": ["It only sees a three by three patch above its head.",
+             "In ten thousand games it met five hundred ninety different patches, and learned a score for each move in each one. That's called Q learning.",
+             "It caught sixty one percent of every coin that fell."]},
+  {"type": "statement", "text": "My best rule: 16 coins. Its practice: 51.", "sub": "what game should it learn next?", "color": "amb",
+   "lines": ["My best hand written rule got sixteen. Practice got fifty one. What game should it learn next? Tell me in the comments."]}
+ ],
+ "thumbnail": {
+  "headline": "It learned from zero",
+  "lines": ["No rules. Just practice.", "Beat every bot I wrote."],
+  "tag": "DAY 12",
+  "card_label": "coins per game",
+  "card_value": "51",
+  "card_sub": "after 10,000 practice games"
+ }
+}
