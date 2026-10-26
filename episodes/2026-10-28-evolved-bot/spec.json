@@ -1,0 +1,57 @@
+{
+ "format": "short",
+ "label": "DAY 14",
+ "title": "I let a genetic algorithm design my bot. It beat mine by 70%.",
+ "hud_stats": {"subs": 1, "views": 465},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "forage", "title": "Not my bot", "bot": [1.606548947384237, -0.05888805201190404, -0.04815847949704922, 0.16371077670373002], "board": 20, "sps": 20, "caption": "evolved",
+   "lines": ["I didn't write this bot. A genetic algorithm evolved it. And it beats the bot I wrote by seventy percent."]},
+  {"type": "list", "title": "My game: Forager", "items": [
+     {"text": "15 x 15 board, 20 food pellets"},
+     {"text": "Each move: -1 energy", "color": "red", "mark": "x"},
+     {"text": "Each pellet: +6 energy", "color": "acc", "mark": "check"},
+     {"text": "Sees food only 3 steps away"},
+     {"text": "Energy hits 0: starved"}],
+   "lines": ["The game: twenty pellets on a fifteen by fifteen board. A move costs one energy, a pellet gives six, and you only see food three steps away."]},
+  {"type": "forage", "title": "The bot I wrote", "bot": "greedy", "board": 20, "sps": 9, "caption": "mine: nearest pellet",
+   "lines": ["My bot walks to the nearest pellet it can see. When it sees nothing, it wanders at random.", "On this board: six pellets, then it starved."]},
+  {"type": "terminal", "title": "The evolved bot's brain", "log": [
+     ["$ cat brain.txt", "dim", {"line": 0}],
+     ["  w_food      likes food nearby", "amb"],
+     ["  w_visited   cells it has been on", "fg"],
+     ["  w_center    distance to the middle", "fg"],
+     ["  w_straight  keep the same direction", "acc"],
+     ["$ evolve --pop 60 --keep 12 --gens 30", "dim", {"line": 1}],
+     ["  each gen: 30 boards, best 12 survive", "fg"],
+     ["  48 kids: mixed + mutated parents", "fg"]],
+   "lines": ["Its brain is four numbers: how much it likes food, old cells, the middle, and walking straight.",
+             "Start with sixty random brains. Each generation, the best twelve survive, and the rest are replaced by their kids: mixed numbers, plus a small mutation."]},
+  {"type": "chart", "title": "Best brain: pellets per game", "x": ["0", "1", "2", "3", "5", "10", "20", "30"], "y": [8.57, 13.43, 16.23, 17.2, 17.67, 18.9, 18.83, 19.07], "unit": "",
+   "point_colors": ["red", "amb", "amb", "acc", "acc", "acc", "acc", "acc"], "legend": [["generation", "dim"]],
+   "lines": ["Generation zero's best brain ate eight and a half pellets a game.", "By generation three, seventeen. After thirty generations, nineteen out of twenty."]},
+  {"type": "bars", "title": "1,000 new boards: pellets per game", "bars": [
+     {"label": "Evolved", "frac": 0.9355, "display": "18.71  (cleared 54.9%)", "color": "acc"},
+     {"label": "Mine", "frac": 0.55, "display": "11.00  (cleared 2.8%)", "color": "red"}],
+   "lines": ["Then both played a thousand new boards. Mine: eleven pellets a game. Evolved: eighteen point seven."]},
+  {"type": "bars", "title": "Switch one number off", "bars": [
+     {"label": "Evolved, all 4 numbers", "frac": 0.9355, "display": "18.71", "color": "acc"},
+     {"label": "No 'visited' number", "frac": 0.816, "display": "16.32", "color": "amb", "line": 1},
+     {"label": "No 'straight' number", "frac": 0.718, "display": "14.36", "color": "red", "line": 1}],
+   "lines": ["So what did it figure out? I switched its numbers off one at a time.", "The biggest drop came from the smallest-looking one: walk straight."]},
+  {"type": "bars", "title": "Moves onto a cell it already visited", "bars": [
+     {"label": "Mine (wanders at random)", "frac": 0.426, "display": "42.6%", "color": "red"},
+     {"label": "Evolved", "frac": 0.202, "display": "20.2%", "color": "acc"}],
+   "lines": ["When it can't see food, it keeps going straight. My random wanderer stepped back onto old cells forty three percent of the time. The evolved one, twenty."]},
+  {"type": "statement", "text": "I never told it to walk straight.", "sub": "4 evolution runs, all 4 learned it. What should I evolve next?", "color": "amb",
+   "lines": ["I never told it to walk straight. I ran evolution four times, and all four found it.", "What should I evolve next? Tell me in the comments."]}
+ ],
+ "thumbnail": {
+  "headline": "Evolution beat my code",
+  "lines": ["A genetic algorithm", "designed this bot."],
+  "tag": "DAY 14",
+  "card_label": "pellets per game",
+  "card_value": "18.7 vs 11",
+  "card_sub": "evolved vs the bot I wrote"
+ }
+}

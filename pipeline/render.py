@@ -24,6 +24,9 @@ Scene types (each scene also has "lines": the narration):
   catch     title, bot (random|chaser|dodger|learner), seed, train (learner practice games, trained
             with seed 12), tps (ticks/sec, default 4), from, upto (tick window), caption: replays a
             real game of games/sky_catch.py (Sky Catch): coins and bombs fall, the player catches
+  forage    title, bot ("greedy" or a genome [w_food, w_visited, w_center, w_straight]), board (seed
+            for the board and the greedy bot's random moves), sps (moves/sec, default 10), caption:
+            replays a real game of games/forager.py (Forager): pellets, sight diamond, trail, energy
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -561,7 +564,65 @@ def s_catch(d, sc, t):
         d.rounded_rectangle([CX - tw / 2 - 30, y0 + gh / 2 - 80 * K, CX + tw / 2 + 30, y0 + gh / 2 + 80 * K], radius=20, fill=rgba(BG, a * 0.85))
         d.text((CX, y0 + gh / 2), "BOOM", font=fb, fill=rgba(RED, a), anchor="mm")
 
-DRAW = {"catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_forage = {}
+def forage_trace(sc):
+    k = (json.dumps(sc["bot"]), sc["board"])
+    if k not in _forage:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import forager as G
+        b = G.board(_r.Random(sc["board"]))
+        tr = []
+        bot = sc["bot"] if sc["bot"] == "greedy" else tuple(sc["bot"])
+        G.play(bot, b, _r.Random(sc["board"]), tr)
+        _forage[k] = (G, tr)
+    return _forage[k]
+
+def s_forage(d, sc, t):
+    G, tr = forage_trace(sc)
+    y = head(d, sc, t, TOP)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    side = min(CW, BOT - 80 * K - (y + 60 * K))
+    x0, y0 = CX - side / 2, y + 60 * K
+    cs = side / G.N
+    card(d, (x0 - 14, y0 - 14, x0 + side + 14, y0 + side + 14), EDGE, (13, 16, 21), a, r=14, w=2)
+    for c in range(1, G.N):
+        d.line([(x0 + c * cs, y0), (x0 + c * cs, y0 + side)], fill=rgba(GRID, a), width=1)
+        d.line([(x0, y0 + c * cs), (x0 + side, y0 + c * cs)], fill=rgba(GRID, a), width=1)
+    sps = sc.get("sps", 10)
+    i = min(len(tr) - 1, int(max(0.0, t - sc["_start"] - 0.5) * sps))
+    bx, by, e, eaten, food = tr[i]
+    # sight diamond
+    for gx in range(G.N):
+        for gy in range(G.N):
+            if abs(gx - bx) + abs(gy - by) <= G.SIGHT:
+                d.rectangle([x0 + gx * cs + 1, y0 + gy * cs + 1, x0 + (gx + 1) * cs - 1, y0 + (gy + 1) * cs - 1], fill=rgba(COL["blue"], a * 0.10))
+    # trail
+    pts = [(x0 + (p[0] + .5) * cs, y0 + (p[1] + .5) * cs) for p in tr[:i + 1]]
+    if len(pts) > 1: d.line(pts, fill=rgba(COL["blue"], a * 0.45), width=max(3, int(cs * 0.16)), joint="curve")
+    rr = cs * 0.24
+    for fx, fy in food:
+        cx, cy = x0 + (fx + .5) * cs, y0 + (fy + .5) * cs
+        d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=rgba(COL["amb"], a))
+    end = i == len(tr) - 1
+    cleared = end and not food
+    starved = end and food and e <= 0
+    c = ACC if cleared else (RED if starved else FG)
+    br = cs * 0.36
+    cx, cy = x0 + (bx + .5) * cs, y0 + (by + .5) * cs
+    d.ellipse([cx - br, cy - br, cx + br, cy + br], fill=rgba(c, a))
+    d.text((x0 - 14, y0 - 30), sc.get("caption", "").upper(), font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="lb")
+    d.text((x0 + side + 14, y0 - 30), f"MOVE {i}", font=F("mono", 34 * K), fill=rgba(DIM, a), anchor="rb")
+    d.text((x0 - 14, y0 + side + 30), f"FOOD {eaten}/{G.FOOD}", font=F("monob", 38 * K), fill=rgba(COL["amb"], a), anchor="lt")
+    d.text((x0 + side + 14, y0 + side + 30), f"ENERGY {e}", font=F("monob", 38 * K), fill=rgba(RED if e <= 5 else ACC, a), anchor="rt")
+    if cleared or starved:
+        txt = "CLEARED" if cleared else "STARVED"
+        fb = F("black", 110 * K)
+        tw = d.textlength(txt, font=fb)
+        d.rounded_rectangle([CX - tw / 2 - 30, y0 + side / 2 - 80 * K, CX + tw / 2 + 30, y0 + side / 2 + 80 * K], radius=20, fill=rgba(BG, a * 0.85))
+        d.text((CX, y0 + side / 2), txt, font=fb, fill=rgba(c, a), anchor="mm")
+
+DRAW = {"forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):
