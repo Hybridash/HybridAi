@@ -27,6 +27,9 @@ Scene types (each scene also has "lines": the narration):
   forage    title, bot ("greedy" or a genome [w_food, w_visited, w_center, w_straight]), board (seed
             for the board and the greedy bot's random moves), sps (moves/sec, default 10), caption:
             replays a real game of games/forager.py (Forager): pellets, sight diamond, trail, energy
+  snake     title, bot (random|greedy|careful|cycle|shortcut), seed (game = play(bot, Random(seed))),
+            sps (steps/sec, or "fit": end fit_end s (default 2) before the scene ends), from (start step), show_loop,
+            caption: replays a real game of games/snake_bots.py (Tail Trap)
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -622,7 +625,94 @@ def s_forage(d, sc, t):
         d.rounded_rectangle([CX - tw / 2 - 30, y0 + side / 2 - 80 * K, CX + tw / 2 + 30, y0 + side / 2 + 80 * K], radius=20, fill=rgba(BG, a * 0.85))
         d.text((CX, y0 + side / 2), txt, font=fb, fill=rgba(c, a), anchor="mm")
 
-DRAW = {"forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_snake = {}
+def snake_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _snake:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import snake_bots as G
+        tr = []
+        res = G.play(sc["bot"], _r.Random(sc["seed"]), tr)
+        _snake[k] = (G, tr, res)
+    return _snake[k]
+
+def s_snake(d, sc, t):
+    G, tr, res = snake_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    if SHORT:
+        y = head(d, sc, t, TOP)
+        side = min(CW, BOT - 80 * K - (y + 60 * K))
+        x0, y0 = CX - side / 2, y + 60 * K
+    else:
+        # long video: smaller one-line title, bigger board, stats beside it
+        d.text((CX, 98), sc.get("title", ""), font=fit_font(d, sc.get("title", ""), "head", 56, CW, 1), fill=rgba(FG, a), anchor="mt")
+        y0 = 240
+        side = H - 335 - y0
+        x0 = CX - side / 2
+    cs = side / G.N
+    card(d, (x0 - 14, y0 - 14, x0 + side + 14, y0 + side + 14), EDGE, (13, 16, 21), a, r=14, w=2)
+    for c in range(1, G.N):
+        d.line([(x0 + c * cs, y0), (x0 + c * cs, y0 + side)], fill=rgba(GRID, a), width=1)
+        d.line([(x0, y0 + c * cs), (x0 + side, y0 + c * cs)], fill=rgba(GRID, a), width=1)
+    if sc.get("show_loop"):
+        c0 = (0, 0); pts = []
+        for _ in range(G.CELLS + 1):
+            pts.append((x0 + (c0[0] + .5) * cs, y0 + (c0[1] + .5) * cs)); c0 = G.NEXT[c0]
+        d.line(pts, fill=rgba(COL["blue"], a * 0.28), width=max(2, int(cs * 0.06)))
+    fr = sc.get("from", 0)
+    sps = sc.get("sps", 8)
+    if sps == "fit":
+        sps = max(1.0, (len(tr) - 1 - fr) / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 2.0)))
+    i = min(len(tr) - 1, fr + int(max(0.0, t - sc["_start"] - 0.5) * sps))
+    body, apple = tr[i]
+    end = i == len(tr) - 1
+    win = end and res["result"] == "win"
+    dead = end and not win
+    if apple:
+        ax, ay = x0 + (apple[0] + .5) * cs, y0 + (apple[1] + .5) * cs
+        rr = cs * 0.28
+        d.ellipse([ax - rr, ay - rr, ax + rr, ay + rr], fill=rgba(COL["amb"], a))
+    n = len(body)
+    w = max(4, int(cs * 0.62))
+    for j in range(n - 1, -1, -1):
+        bx, by = body[j]
+        f = 1 - 0.55 * j / max(1, n - 1)
+        base_c = RED if dead else ACC
+        c = tuple(int(v * f + 20 * (1 - f)) for v in base_c)
+        m = cs * 0.5 - w / 2
+        d.rounded_rectangle([x0 + bx * cs + m, y0 + by * cs + m, x0 + (bx + 1) * cs - m, y0 + (by + 1) * cs - m], radius=int(w * 0.3), fill=rgba(c, a))
+        if j + 1 < n:
+            px, py = body[j + 1]
+            if abs(px - bx) + abs(py - by) == 1:
+                ax_, ay_ = x0 + (min(px, bx) + .5) * cs, y0 + (min(py, by) + .5) * cs
+                bx_, by_ = x0 + (max(px, bx) + .5) * cs, y0 + (max(py, by) + .5) * cs
+                d.rectangle([ax_ - w / 2, ay_ - w / 2, bx_ + w / 2, by_ + w / 2], fill=rgba(c, a))
+    hx, hy = body[0]
+    ex, ey = x0 + (hx + .5) * cs, y0 + (hy + .5) * cs
+    er = cs * 0.08
+    d.ellipse([ex - er, ey - er, ex + er, ey + er], fill=rgba(BG, a))
+    d.text((x0 - 14, y0 - 30), sc.get("caption", "").upper(), font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="lb")
+    d.text((x0 + side + 14, y0 - 30), f"STEP {i}", font=F("mono", 34 * K), fill=rgba(DIM, a), anchor="rb")
+    if SHORT:
+        d.text((x0 - 14, y0 + side + 30), f"LENGTH {n}", font=F("monob", 38 * K), fill=rgba(ACC, a), anchor="lt")
+        d.text((x0 + side + 14, y0 + side + 30), f"{G.CELLS - n} EMPTY", font=F("monob", 38 * K), fill=rgba(DIM, a), anchor="rt")
+    else:
+        lx, rx = x0 - 70, x0 + side + 70
+        d.text((lx, y0 + side / 2 - 10), "LENGTH", font=F("bold", 34), fill=rgba(DIM, a), anchor="rb")
+        d.text((lx, y0 + side / 2 + 10), str(n), font=F("black", 110), fill=rgba(RED if dead else ACC, a), anchor="rt")
+        d.text((rx, y0 + side / 2 - 10), "EMPTY CELLS", font=F("bold", 34), fill=rgba(DIM, a), anchor="lb")
+        d.text((rx, y0 + side / 2 + 10), str(G.CELLS - n), font=F("black", 110), fill=rgba(FG, a), anchor="lt")
+    if end:
+        txt = {"win": "BOARD FULL", "crash": "TRAPPED", "stall": "STALLED"}.get(res["result"], "")
+        fb = F("black", 100 * K if SHORT else 64)
+        tw = d.textlength(txt, font=fb)
+        by = y0 + side / 2 if SHORT else y0 + side + 50
+        hh = 75 * K if SHORT else 46
+        d.rounded_rectangle([CX - tw / 2 - 30, by - hh, CX + tw / 2 + 30, by + hh], radius=20, fill=rgba(BG, a * 0.85))
+        d.text((CX, by), txt, font=fb, fill=rgba(ACC if win else RED, a), anchor="mm")
+
+DRAW = {"snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):
