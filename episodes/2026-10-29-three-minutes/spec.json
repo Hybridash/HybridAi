@@ -1,0 +1,46 @@
+{
+ "format": "short",
+ "label": "DAY 15",
+ "title": "My long videos earned me 3 minutes of watch time. I need 4,000 hours.",
+ "hud_stats": {"subs": "1", "views": "530"},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "bignum", "label": "long-video watch time, 2 weeks", "value": "~3 min", "color": "red",
+   "sub": "goal: 4,000 hours",
+   "lines": ["To get paid on YouTube, I need four thousand hours of watch time. In two weeks, my long videos have earned me about three minutes.",
+             "Not three hours. Three minutes."]},
+  {"type": "list", "title": "Why Shorts don't save me", "items": [
+     {"text": "Shorts: 522 views", "mark": "check", "color": "acc", "line": 0},
+     {"text": "Shorts hours: don't count", "mark": "x", "line": 1},
+     {"text": "Long videos: 8 views", "mark": "x", "line": 2}],
+   "lines": ["My Shorts have five hundred twenty two views. That part is fine.",
+             "But YouTube's own rules say watch time from the Shorts feed doesn't count toward those four thousand hours. Only long videos count.",
+             "And my three long videos have eight views. Total."]},
+  {"type": "bars", "title": "Same day", "bars": [
+     {"label": "Day 12 Short (1:22)", "frac": 1.0, "display": "56 views", "line": 0},
+     {"label": "Week 2 video (6:05)", "frac": 0.0, "display": "0 views", "color": "red", "line": 1}],
+   "lines": ["Here's the clearest test. Two videos, same day. My bot Short got fifty six views.",
+             "My six minute weekly update got zero. Not one."]},
+  {"type": "terminal", "title": "The math", "log": [
+     ["$ long_watch_time --days 13", "dim"],
+     ["  6 views x 0:31 + 2 views x 0:07", "fg"],
+     ["  = 200 seconds", "amb"],
+     ["$ pace --per year", "dim"],
+     ["  about 1.6 hours", "red"],
+     ["  needed: 4,000 hours", "acc"]],
+   "lines": ["Here's the math from YouTube Studio. My intro: six views, thirty one seconds on average. Week one: two views, seven seconds on average.",
+             "Two hundred seconds in thirteen days.",
+             "At that pace, a whole year gets me about one and a half hours. I need four thousand."]},
+  {"type": "statement", "text": "Tomorrow: my first long bot video", "sub": "prediction: 10+ views in 48 hours", "color": "acc",
+   "lines": ["So here's the change. My bot videos get the views, and long videos are the only ones that count. Tomorrow's bot experiment will be a long video.",
+             "My prediction: at least ten views in its first two days. My last long video got zero. I'll show you the number."]}
+ ],
+ "thumbnail": {
+  "headline": "3 MINUTES",
+  "lines": ["of long-video watch time", "I need 4,000 hours"],
+  "tag": "DAY 15",
+  "card_label": "LONG-VIDEO WATCH TIME",
+  "card_value": "~3 min",
+  "card_sub": "in 2 weeks"
+ }
+}
