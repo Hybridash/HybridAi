@@ -1,0 +1,141 @@
+{
+ "format": "short",
+ "label": "DAY 17",
+ "title": "Why is my Short not getting views? Mine got 1 in 15 hours.",
+ "hud_stats": {
+  "subs": "1",
+  "views": "571"
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bignum",
+   "label": "my newest Short, first 15 hours",
+   "value": "1",
+   "color": "red",
+   "sub": "view. Ranked 10 of 10.",
+   "lines": [
+    "My newest Short got exactly one view in its first fifteen hours.",
+    "YouTube Studio ranks that start last out of my last ten Shorts."
+   ]
+  },
+  {
+   "type": "sources",
+   "title": "Where it came from",
+   "video": "Day 15: My long videos earned me 3 minutes...",
+   "rows": [
+    {
+     "label": "Notifications",
+     "pct": 100,
+     "views": 1,
+     "color": "amb",
+     "line": 0
+    },
+    {
+     "label": "Shorts feed",
+     "pct": 0,
+     "views": 0,
+     "line": 1
+    },
+    {
+     "label": "YouTube search",
+     "pct": 0,
+     "views": 0,
+     "line": 2
+    }
+   ],
+   "lines": [
+    "So where did that one view come from? Studio says one hundred percent: notifications.",
+    "The Shorts feed sent zero people.",
+    "Search sent zero."
+   ]
+  },
+  {
+   "type": "notify",
+   "title": "Who got it?",
+   "app": "YouTube",
+   "text": "HybridAi uploaded: My long videos earned me 3 minutes of watch time",
+   "to": "I have 1 subscriber",
+   "note": "YouTube also notifies some people based on their interests, so I can't tell who it was.",
+   "lines": [
+    "Somebody got a notification and tapped it.",
+    "I have exactly one subscriber. So it might have been them.",
+    "But YouTube's help page says it can also send notifications based on people's interests. So I honestly can't tell who it was."
+   ]
+  },
+  {
+   "type": "sources",
+   "title": "Two days earlier",
+   "video": "Day 14: I let a genetic algorithm design my bot...",
+   "rows": [
+    {
+     "label": "YouTube search",
+     "pct": 69.2,
+     "views": 9,
+     "line": 1
+    },
+    {
+     "label": "Shorts feed",
+     "pct": 23.1,
+     "views": 3,
+     "color": "blue",
+     "line": 1
+    },
+    {
+     "label": "Direct or unknown",
+     "pct": 7.7,
+     "views": 1,
+     "color": "dim",
+     "line": 2
+    }
+   ],
+   "lines": [
+    "Now my Day 14 Short. Thirteen views so far.",
+    "Sixty nine percent came from search. Its title names a real thing people look up: genetic algorithm.",
+    "Day fifteen's title was about my watch time. Search sent it nothing."
+   ]
+  },
+  {
+   "type": "search",
+   "title": "So I asked YouTube's search bar",
+   "queries": [
+    {
+     "q": "why does my short have 0 views",
+     "note": "suggested",
+     "line": 0
+    },
+    {
+     "q": "why is my shorts not getting views",
+     "note": "suggested",
+     "line": 1
+    }
+   ],
+   "result": "real autocomplete, October 30",
+   "lines": [
+    "So I typed the start of a question into YouTube's search bar. It suggested: why does my short have zero views.",
+    "And: why is my shorts not getting views. People really search this."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Today's title is that question.",
+   "sub": "prediction: 1+ search view in 7 days",
+   "color": "acc",
+   "lines": [
+    "So today's title is that exact question. Same channel, same voice, one change: a title someone might type.",
+    "My prediction: at least one view from search in seven days, and more views in two days than Day fifteen got. Is your Short stuck too? Tell me in the comments."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "1 VIEW",
+  "lines": [
+   "in 15 hours",
+   "here's where it came from"
+  ],
+  "tag": "DAY 17",
+  "card_label": "SHORTS FEED SENT",
+  "card_value": "0",
+  "card_sub": "people"
+ }
+}

@@ -30,6 +30,10 @@ Scene types (each scene also has "lines": the narration):
   snake     title, bot (random|greedy|careful|cycle|shortcut), seed (game = play(bot, Random(seed))),
             sps (steps/sec, or "fit": end fit_end s (default 2) before the scene ends), from (start step), show_loop,
             caption: replays a real game of games/snake_bots.py (Tail Trap)
+  sources   title, video (small caption under the title), rows: [{label, pct (0-100), views, color, line}]:
+            a Studio-style "top traffic sources" card; 0% rows are drawn dim with an empty bar
+  notify    title, app, text, to (recipient line), note: a phone notification card slides in,
+            bell icon rings; the "to" line and note reveal on lines 1 and 2
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -712,7 +716,80 @@ def s_snake(d, sc, t):
         d.rounded_rectangle([CX - tw / 2 - 30, by - hh, CX + tw / 2 + 30, by + hh], radius=20, fill=rgba(BG, a * 0.85))
         d.text((CX, by), txt, font=fb, fill=rgba(ACC if win else RED, a), anchor="mm")
 
-DRAW = {"snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+def s_sources(d, sc, t):
+    y = head(d, sc, t, TOP)
+    a0 = ease((t - sc["_start"] + 0.1) / 0.4)
+    x0, x1 = CX - CW / 2 - 10, CX + CW / 2 + 10
+    rows = sc.get("rows", [])
+    times = reveal_times(sc, rows)
+    rowh = 150 * K
+    hh = 110 * K if sc.get("video") else 70 * K
+    y1 = y + hh + rowh * len(rows) + 20 * K
+    card(d, (x0, y, x1, y1), EDGE, (13, 16, 21), a0, r=22, w=2)
+    d.text((x0 + 40, y + 34 * K), "TOP TRAFFIC SOURCES", font=F("bold", 32 * K), fill=rgba(DIM, a0), anchor="lt")
+    if sc.get("video"):
+        f = F("med", 34 * K); v = sc["video"]
+        while d.textlength(v, font=f) > (x1 - x0 - 80) and len(v) > 4: v = v[:-2]
+        if v != sc["video"]: v = v.rstrip() + "…"
+        d.text((x0 + 40, y + 76 * K), v, font=f, fill=rgba(FG, a0 * 0.8), anchor="lt")
+    yy = y + hh + 10 * K
+    for k, r in enumerate(rows):
+        a = ease((t - times[k]) / 0.35)
+        if a <= 0: yy += rowh; continue
+        pct = float(r.get("pct", 0))
+        c = col(r.get("color"), ACC) if pct > 0 else DIM
+        d.text((x0 + 40, yy + 20 * K), r["label"], font=F("bold", 44 * K), fill=rgba(FG if pct > 0 else DIM, a), anchor="lt")
+        txt = (f"{pct:g}%" if pct else "0%") + (f"  ({r['views']})" if "views" in r else "")
+        d.text((x1 - 40, yy + 20 * K), txt, font=F("monob", 40 * K), fill=rgba(c, a), anchor="rt")
+        by = yy + 86 * K
+        card(d, (x0 + 40, by, x1 - 40, by + 26 * K), None, (30, 35, 45), a, r=13, w=0)
+        fr = pct / 100 * ease((t - times[k] - 0.2) / 0.8)
+        if fr > 0:
+            card(d, (x0 + 40, by, x0 + 40 + max(26, (x1 - x0 - 80) * fr), by + 26 * K), None, c, a, r=13, w=0)
+        yy += rowh
+
+def bell(d, cx, cy, s, c, a, ang=0.0):
+    ca, sa = math.cos(ang), math.sin(ang)
+    def R(x, y): return (cx + x * ca - y * sa, cy + x * sa + y * ca)
+    body = [R(-0.55 * s, 0.35 * s), R(-0.42 * s, -0.25 * s), R(-0.2 * s, -0.55 * s), R(0, -0.62 * s),
+            R(0.2 * s, -0.55 * s), R(0.42 * s, -0.25 * s), R(0.55 * s, 0.35 * s), R(0.7 * s, 0.5 * s), R(-0.7 * s, 0.5 * s)]
+    d.polygon(body, fill=rgba(c, a))
+    kx, ky = R(0, 0.68 * s)
+    d.ellipse([kx - 0.16 * s, ky - 0.16 * s, kx + 0.16 * s, ky + 0.16 * s], fill=rgba(c, a))
+
+def s_notify(d, sc, t):
+    y = head(d, sc, t, TOP)
+    st = sc["_start"]
+    ls = [l["start"] for l in sc["_lines"]]
+    a0 = ease((t - st + 0.1) / 0.4)
+    ring = math.sin((t - st) * 18) * 0.35 * max(0, 1 - (t - st) / 1.6)
+    bs = 90 * K
+    bell(d, CX, y + bs * 0.75, bs, COL["amb"], a0, ring)
+    y += bs * 1.9
+    sl = ease((t - st - 0.4) / 0.5)
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    yy = y + (1 - sl) * -60
+    ch = 230 * K
+    card(d, (x0, yy, x1, yy + ch), EDGE, (28, 32, 42), sl, r=30, w=2)
+    d.ellipse([x0 + 34, yy + 34, x0 + 34 + 70 * K, yy + 34 + 70 * K], fill=rgba(ACC, sl))
+    d.text((x0 + 34 + 35 * K, yy + 34 + 35 * K), "H", font=F("black", 44 * K), fill=rgba(BG, sl), anchor="mm")
+    d.text((x0 + 60 + 70 * K, yy + 40), sc.get("app", "YouTube"), font=F("bold", 34 * K), fill=rgba(DIM, sl), anchor="lt")
+    d.text((x1 - 34, yy + 40), "now", font=F("med", 32 * K), fill=rgba(DIM, sl), anchor="rt")
+    f = F("med", 40 * K)
+    tl = wrap(d, sc.get("text", ""), f, x1 - x0 - 100 - 70 * K)[:2]
+    for i, ln in enumerate(tl):
+        d.text((x0 + 60 + 70 * K, yy + 95 * K + i * 50 * K), ln, font=f, fill=rgba(FG, sl), anchor="lt")
+    y = yy + ch + 60 * K
+    if sc.get("to"):
+        ta = ls[1] if len(ls) > 1 else st + 1.5
+        a = ease((t - ta) / 0.4)
+        d.text((CX, y), sc["to"], font=F("head", 64 * K), fill=rgba(FG, a), anchor="mt")
+        y += 110 * K
+    if sc.get("note"):
+        ta = ls[2] if len(ls) > 2 else st + 3
+        text_block(d, y, sc["note"], F("med", 44 * K), COL["amb"], ease((t - ta) / 0.4))
+
+DRAW = {"sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):
