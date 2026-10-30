@@ -32,6 +32,8 @@ Scene types (each scene also has "lines": the narration):
             caption: replays a real game of games/snake_bots.py (Tail Trap)
   sources   title, video (small caption under the title), rows: [{label, pct (0-100), views, color, line}]:
             a Studio-style "top traffic sources" card; 0% rows are drawn dim with an empty bar
+  duel      title, a, b (bots), seed (game = play(a, b, Random(seed), trace=True)), sps (steps/sec or "fit"),
+            name_a, name_b, color_a, color_b, caption: replays a real game of games/trail_duel.py (Trail Duel)
   notify    title, app, text, to (recipient line), note: a phone notification card slides in,
             bell icon rings; the "to" line and note reveal on lines 1 and 2
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
@@ -716,6 +718,62 @@ def s_snake(d, sc, t):
         d.rounded_rectangle([CX - tw / 2 - 30, by - hh, CX + tw / 2 + 30, by + hh], radius=20, fill=rgba(BG, a * 0.85))
         d.text((CX, by), txt, font=fb, fill=rgba(ACC if win else RED, a), anchor="mm")
 
+_duel = {}
+def duel_trace(sc):
+    k = (sc["a"], sc["b"], sc["seed"])
+    if k not in _duel:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import trail_duel as G
+        res, steps, trails = G.play(sc["a"], sc["b"], _r.Random(sc["seed"]), trace=True)
+        _duel[k] = (G, res, steps, trails)
+    return _duel[k]
+
+def s_duel(d, sc, t):
+    G, res, steps, trails = duel_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    side = min(CW, BOT + 40 - (y + 70 * K))
+    x0, y0 = CX - side / 2, y + 70 * K
+    cs = side / G.N
+    card(d, (x0 - 14, y0 - 14, x0 + side + 14, y0 + side + 14), EDGE, (13, 16, 21), a, r=14, w=2)
+    for c in range(1, G.N):
+        d.line([(x0 + c * cs, y0), (x0 + c * cs, y0 + side)], fill=rgba(GRID, a), width=1)
+        d.line([(x0, y0 + c * cs), (x0 + side, y0 + c * cs)], fill=rgba(GRID, a), width=1)
+    sps = sc.get("sps", 8)
+    if sps == "fit":
+        sps = max(1.0, steps / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 2.0)))
+    i = min(steps, int(max(0.0, t - sc["_start"] - 0.5) * sps))
+    end = i == steps
+    cols = [col(sc.get("color_a", "acc")), col(sc.get("color_b", "blue"))]
+    w = max(4, int(cs * 0.5))
+    for p in range(2):
+        tr = trails[p][:i + 1]
+        crashed = end and (res == 0 or res == 2 - p)
+        c = cols[p]
+        for j in range(len(tr) - 1):
+            ax, ay = tr[j]; bx, by = tr[j + 1]
+            if not (0 <= bx < G.N and 0 <= by < G.N):
+                bx, by = ax + (bx - ax) * 0.5, ay + (by - ay) * 0.5
+            d.line([(x0 + (ax + .5) * cs, y0 + (ay + .5) * cs), (x0 + (bx + .5) * cs, y0 + (by + .5) * cs)], fill=rgba(tuple(int(v * 0.62) for v in c), a), width=w)
+        hx, hy = tr[-1]
+        hx, hy = min(max(hx, -0.3), G.N - 0.7), min(max(hy, -0.3), G.N - 0.7)
+        cx_, cy_ = x0 + (hx + .5) * cs, y0 + (hy + .5) * cs
+        rr = cs * 0.42
+        d.ellipse([cx_ - rr, cy_ - rr, cx_ + rr, cy_ + rr], fill=rgba(RED if crashed else c, a), outline=rgba(FG, a), width=3)
+    na, nb = sc.get("name_a", sc["a"]).upper(), sc.get("name_b", sc["b"]).upper()
+    d.text((x0 - 14, y0 - 30), na, font=F("monob", 36 * K), fill=rgba(cols[0], a), anchor="lb")
+    d.text((x0 + side + 14, y0 - 30), nb, font=F("monob", 36 * K), fill=rgba(cols[1], a), anchor="rb")
+    d.text((CX, y0 - 30), f"STEP {i}", font=F("mono", 34 * K), fill=rgba(DIM, a), anchor="mb")
+    if end:
+        txt = "DRAW" if res == 0 else f"{(na if res == 1 else nb)} WINS"
+        fb = fit_font(d, txt, "black", 96 * K, side * 0.9, 1)
+        tw = d.textlength(txt, font=fb)
+        by = y0 + side / 2
+        hh = fb.size * 0.72
+        d.rounded_rectangle([CX - tw / 2 - 30, by - hh, CX + tw / 2 + 30, by + hh], radius=20, fill=rgba(BG, a * 0.88))
+        d.text((CX, by), txt, font=fb, fill=rgba(COL["amb"] if res == 0 else cols[res - 1], a), anchor="mm")
+
 def s_sources(d, sc, t):
     y = head(d, sc, t, TOP)
     a0 = ease((t - sc["_start"] + 0.1) / 0.4)
@@ -789,7 +847,7 @@ def s_notify(d, sc, t):
         ta = ls[2] if len(ls) > 2 else st + 3
         text_block(d, y, sc["note"], F("med", 44 * K), COL["amb"], ease((t - ta) / 0.4))
 
-DRAW = {"sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+DRAW = {"duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):

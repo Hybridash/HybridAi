@@ -1,0 +1,57 @@
+{
+ "format": "short",
+ "label": "DAY 18",
+ "title": "My worst bot never beat my best bot. It tied it 928 times out of 1,000.",
+ "hud_stats": {"subs": 1, "views": 578},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "duel", "title": "Worst vs best", "a": "chaser", "b": "territory", "seed": 1, "sps": 3.2, "fit_end": 1.5,
+   "name_a": "chaser", "name_b": "territory", "color_a": "red", "color_b": "acc",
+   "lines": ["My worst bot never beat my best one. Not once in a thousand games. But it tied it nine hundred and twenty eight times."]},
+  {"type": "list", "title": "My game: Trail Duel", "items": [
+     {"text": "16 x 16 board, 2 riders"},
+     {"text": "Both move at the same time"},
+     {"text": "Cells you leave become walls"},
+     {"text": "Hit a wall or edge: crash", "color": "red", "mark": "x"},
+     {"text": "Last one moving wins", "color": "acc", "mark": "check"},
+     {"text": "Same cell, same step: DRAW", "color": "amb"}],
+   "lines": ["I coded a two player game. Both riders move at the same time, and every cell they leave becomes a wall.", "Crash and you lose. Last one moving wins. Step into the same cell at the same time, and it's a draw."]},
+  {"type": "list", "title": "6 bots", "items": [
+     {"text": "Random: any safe move"},
+     {"text": "Straight: turns when blocked"},
+     {"text": "Hugger: stays close to walls"},
+     {"text": "Space: keeps the most room"},
+     {"text": "Chaser: drives at its rival", "color": "red"},
+     {"text": "Territory: grabs cells first", "color": "acc"}],
+   "lines": ["Six bots. The chaser just drives at the other rider. Territory, my smartest, counts which cells it can reach before its rival, and takes the move with the biggest lead."]},
+  {"type": "bars", "title": "Losses out of 5,000 games", "bars": [
+     {"label": "Territory", "frac": 0.0176, "display": "88", "color": "acc"},
+     {"label": "Space", "frac": 0.0742, "display": "371", "color": "acc"},
+     {"label": "Chaser", "frac": 0.1622, "display": "811", "color": "amb"},
+     {"label": "Random", "frac": 0.6286, "display": "3,143", "color": "red"}],
+   "lines": ["Every pair played a thousand games. Territory lost just eighty eight out of five thousand."]},
+  {"type": "bars", "title": "Chaser vs Territory", "bars": [
+     {"label": "Chaser wins", "frac": 0.0, "display": "0", "color": "red"},
+     {"label": "Territory wins", "frac": 0.072, "display": "72", "color": "acc"},
+     {"label": "Draws", "frac": 0.928, "display": "928", "color": "amb", "line": 1}],
+   "lines": ["Against the chaser, it won only seventy two.", "The rest were draws. In a rematch, every single draw was a head on crash."]},
+  {"type": "bignum", "label": "games that ended head-on, all 15,000", "value": "7,530", "sub": "half of every game I ran", "color": "amb",
+   "lines": ["Across all fifteen thousand games, seven thousand five hundred and thirty ended head on. My bots check walls, but not where the other rider is about to step."]},
+  {"type": "duel", "title": "The fix: Wary", "a": "chaser", "b": "wary", "seed": 4, "sps": "fit", "fit_end": 1.5,
+   "name_a": "chaser", "name_b": "wary", "color_a": "red", "color_b": "blue",
+   "lines": ["So I made a fix, called Wary. Same brain, but it never steps where the other rider could also step.", "Against the chaser: nine hundred and twenty four wins out of a thousand."]},
+  {"type": "duel", "title": "Wary vs the old bot", "a": "territory", "b": "wary", "seed": 7, "sps": "fit", "fit_end": 1.5,
+   "name_a": "territory", "name_b": "wary", "color_a": "acc", "color_b": "blue",
+   "lines": ["Then I put the fix against the old version. It lost six hundred and nine of a thousand, and won only three hundred and fifty four.", "Wary backed away from a shared cell three thousand eight hundred and eighty six times. Eighty three percent of the time, the old bot took that exact cell."]},
+  {"type": "statement", "text": "Backing off gave the cell away.", "sub": "Territory beats Wary. Wary beats Chaser. Chaser ties Territory. Which bot should I build next?", "color": "amb",
+   "lines": ["Backing off hands the cell to the bot that doesn't. Now no bot beats all the others.", "What bot should I build next? Tell me in the comments."]}
+ ],
+ "thumbnail": {
+  "headline": "My worst bot tied my best",
+  "lines": ["It never won.", "It just crashed into it."],
+  "tag": "DAY 18",
+  "card_label": "chaser vs territory",
+  "card_value": "928 draws",
+  "card_sub": "out of 1,000 games, 0 chaser wins"
+ }
+}
