@@ -1,0 +1,153 @@
+{
+ "format": "short",
+ "label": "DAY 19",
+ "title": "One Short had 9 views after 17 hours, the other had 1. Now both have 10.",
+ "hud_stats": {
+  "subs": "1",
+  "views": "590"
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bars",
+   "title": "Early count",
+   "bars": [
+    {
+     "label": "Day 13, at 17 hours",
+     "frac": 0.9,
+     "display": "9 views",
+     "color": "acc",
+     "line": 0
+    },
+    {
+     "label": "Day 15, at 15 hours",
+     "frac": 0.1,
+     "display": "1 view",
+     "color": "red",
+     "line": 1
+    }
+   ],
+   "lines": [
+    "Seventeen hours after it went up, my Day thirteen Short had nine views.",
+    "My Day fifteen Short, fifteen hours in, had one."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "October 31",
+   "bars": [
+    {
+     "label": "Day 13, after 4 days",
+     "frac": 1.0,
+     "display": "10 views",
+     "color": "acc",
+     "line": 0
+    },
+    {
+     "label": "Day 15, after 2 days",
+     "frac": 1.0,
+     "display": "10 views",
+     "color": "acc",
+     "line": 0
+    }
+   ],
+   "lines": [
+    "On October thirty first, as I make this, YouTube Studio shows exactly ten for both.",
+    "Nine to one turned into a tie."
+   ]
+  },
+  {
+   "type": "chart",
+   "title": "Day 15's views",
+   "x": [
+    "15h",
+    "29h",
+    "53h"
+   ],
+   "y": [
+    1,
+    3,
+    10
+   ],
+   "unit": "views",
+   "point_colors": [
+    "red",
+    "amb",
+    "acc"
+   ],
+   "lines": [
+    "Here's Day fifteen, checked three times. One view at fifteen hours.",
+    "Three at twenty nine hours.",
+    "Ten at fifty three hours. Most of its views came after I'd written it off."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "Where the 10 came from",
+   "log": [
+    [
+     "$ studio --video day13 --sources",
+     "dim"
+    ],
+    [
+     "  Shorts feed 8   channel page 1   search 1",
+     "fg"
+    ],
+    [
+     "  fast start, then flat",
+     "amb"
+    ],
+    [
+     "$ studio --video day15 --sources",
+     "dim"
+    ],
+    [
+     "  Shorts feed 9   notifications 1",
+     "fg"
+    ],
+    [
+     "  slow start, then the feed found it",
+     "acc"
+    ]
+   ],
+   "lines": [
+    "Where did the views come from? Day thirteen: eight from the Shorts feed, one from my channel page, one from search. Almost all in the first day.",
+    "Day fifteen: one from a notification, then nine from the Shorts feed, and those came late.",
+    "Same ending, opposite paths."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "I judged it at 15 hours.",
+   "sub": "Day 17 was a whole video about that 1 view",
+   "color": "red",
+   "lines": [
+    "And here's my mistake. My Day seventeen video was all about that one view at fifteen hours.",
+    "The early number didn't tell me where the Short would end up."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "Day 17, first 5 hours",
+   "value": "3",
+   "color": "amb",
+   "sub": "prediction: 10+ by Nov 3",
+   "lines": [
+    "So, a test. Day seventeen itself had three views at five hours. Studio says three less than usual.",
+    "My prediction: it reaches ten views by November third, three days after it went up. From now on I wait three days before I call a Short dead.",
+    "How long do you wait before judging a Short? Tell me in the comments."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "9 VS 1",
+  "lines": [
+   "views on day one",
+   "both had 10 by Oct 31"
+  ],
+  "tag": "DAY 19",
+  "card_label": "OCT 31",
+  "card_value": "10 = 10",
+  "card_sub": "views each"
+ }
+}
