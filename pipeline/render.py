@@ -36,6 +36,10 @@ Scene types (each scene also has "lines": the narration):
             name_a, name_b, color_a, color_b, caption: replays a real game of games/trail_duel.py (Trail Duel)
   notify    title, app, text, to (recipient line), note: a phone notification card slides in,
             bell icon rings; the "to" line and note reveal on lines 1 and 2
+  grab      title, a, b (bots; a moves first), board (seed: board = new_board(Random(board))), seed
+            (game = play(a, b, board, Random(seed))), mps (moves/sec or "fit", fit_end s), name_a, name_b,
+            color_a, color_b, upto (stop after N moves), caption: replays a real game of games/cross_grab.py
+            (Cross Grab): the allowed row + column glow, claimed cells fill with the claimer's color
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -774,6 +778,77 @@ def s_duel(d, sc, t):
         d.rounded_rectangle([CX - tw / 2 - 30, by - hh, CX + tw / 2 + 30, by + hh], radius=20, fill=rgba(BG, a * 0.88))
         d.text((CX, by), txt, font=fb, fill=rgba(COL["amb"] if res == 0 else cols[res - 1], a), anchor="mm")
 
+_grab = {}
+def grab_trace(sc):
+    k = (sc["a"], sc["b"], sc["board"], sc["seed"])
+    if k not in _grab:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import cross_grab as G
+        board = G.new_board(_r.Random(sc["board"]))
+        sa, sb, moves = G.play(sc["a"], sc["b"], board, _r.Random(sc["seed"]))
+        _grab[k] = (G, board, moves)
+    return _grab[k]
+
+def s_grab(d, sc, t):
+    G, board, moves = grab_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    n = min(len(moves), sc.get("upto", len(moves)))
+    mps = sc.get("mps", 1.5)
+    if mps == "fit":
+        mps = max(0.5, n / max(1.0, sc["_end"] - sc["_start"] - 0.6 - sc.get("fit_end", 2.0)))
+    i = min(n, int(max(0.0, t - sc["_start"] - 0.6) * mps))
+    end = i == len(moves)
+    cols = [col(sc.get("color_a", "acc")), col(sc.get("color_b", "blue"))]
+    side = min(CW * 0.9, BOT - 40 - (y + 150 * K))
+    x0, y0 = CX - side / 2, y + 150 * K
+    cs = side / G.N
+    owner = {}
+    sc_ = [0, 0]
+    for j, m in enumerate(moves[:i]):
+        owner[m] = j % 2; sc_[j % 2] += board[m]
+    last = moves[i - 1] if i else None
+    lr, lc = divmod(last, G.N) if last is not None else (None, None)
+    # scores
+    na, nb = sc.get("name_a", sc["a"]).upper(), sc.get("name_b", sc["b"]).upper()
+    fs = F("monob", 38 * K); fn = F("black", 76 * K)
+    d.text((x0, y + 10), na, font=fs, fill=rgba(cols[0], a), anchor="lt")
+    d.text((x0 + side, y + 10), nb, font=fs, fill=rgba(cols[1], a), anchor="rt")
+    d.text((x0, y + 58 * K), str(sc_[0]), font=fn, fill=rgba(cols[0], a), anchor="lt")
+    d.text((x0 + side, y + 58 * K), str(sc_[1]), font=fn, fill=rgba(cols[1], a), anchor="rt")
+    if not end:
+        tomove = i % 2
+        d.text((CX, y + 66 * K), ("<" if tomove == 0 else ">"), font=F("monob", 64 * K), fill=rgba(cols[tomove], a), anchor="mt")
+    card(d, (x0 - 14, y0 - 14, x0 + side + 14, y0 + side + 14), EDGE, (13, 16, 21), a, r=14, w=2)
+    glow = cols[i % 2] if not end else DIM
+    ff = F("black", cs * 0.5)
+    for r in range(G.N):
+        for c in range(G.N):
+            m = r * G.N + c
+            bx = (x0 + c * cs + 5, y0 + r * cs + 5, x0 + (c + 1) * cs - 5, y0 + (r + 1) * cs - 5)
+            if m in owner:
+                cc = cols[owner[m]]
+                fill = tuple(int(v * 0.30) for v in cc)
+                d.rounded_rectangle(bx, radius=12, fill=rgba(fill, a), outline=rgba(cc, a * (1 if m == last else 0.5)), width=6 if m == last else 2)
+                d.text(((bx[0] + bx[2]) / 2, (bx[1] + bx[3]) / 2), str(board[m]), font=ff, fill=rgba(tuple(int(v * 0.75) for v in cc), a), anchor="mm")
+            else:
+                lane = last is not None and not end and (r == lr or c == lc)
+                d.rounded_rectangle(bx, radius=12, fill=rgba(tuple(int(v * 0.16) for v in glow) if lane else (24, 28, 36), a),
+                                    outline=rgba(glow, a * 0.9) if lane else rgba(EDGE, a), width=3 if lane else 2)
+                d.text(((bx[0] + bx[2]) / 2, (bx[1] + bx[3]) / 2), str(board[m]), font=ff, fill=rgba(FG if (lane or last is None) else DIM, a), anchor="mm")
+    if end:
+        res = 0 if sc_[0] == sc_[1] else (1 if sc_[0] > sc_[1] else 2)
+        txt = "DRAW" if res == 0 else f"{(na if res == 1 else nb)} WINS"
+        fb = fit_font(d, txt, "black", 96 * K, side * 0.9, 1)
+        tw = d.textlength(txt, font=fb)
+        by = y0 + side / 2
+        hh = fb.size * 0.72
+        d.rounded_rectangle([CX - tw / 2 - 30, by - hh, CX + tw / 2 + 30, by + hh], radius=20, fill=rgba(BG, a * 0.9))
+        d.text((CX, by), txt, font=fb, fill=rgba(COL["amb"] if res == 0 else cols[res - 1], a), anchor="mm")
+    if sc.get("caption"):
+        text_block(d, y0 + side + 34, sc["caption"], F("body", 34 * K), DIM, a)
+
 def s_sources(d, sc, t):
     y = head(d, sc, t, TOP)
     a0 = ease((t - sc["_start"] + 0.1) / 0.4)
@@ -847,7 +922,7 @@ def s_notify(d, sc, t):
         ta = ls[2] if len(ls) > 2 else st + 3
         text_block(d, y, sc["note"], F("med", 44 * K), COL["amb"], ease((t - ta) / 0.4))
 
-DRAW = {"duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+DRAW = {"grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):

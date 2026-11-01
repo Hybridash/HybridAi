@@ -1,0 +1,61 @@
+{
+ "format": "short",
+ "label": "DAY 20",
+ "title": "AI plays my number game 10,000 times. The bot that imagines the future lost to the greedy one.",
+ "hud_stats": {"subs": 1, "views": 740},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "grab", "title": "Greedy vs Monte", "a": "greedy", "b": "monte", "board": 2000083, "seed": 158426, "mps": "fit", "fit_end": 1.6,
+   "name_a": "greedy", "name_b": "monte", "color_a": "amb", "color_b": "blue",
+   "lines": ["This bot plays forty imaginary games before every single move. That one just grabs the biggest number it can.", "The greedy one won more often."]},
+  {"type": "list", "title": "My game: Cross Grab", "items": [
+     {"text": "5 x 5 board, numbers 1 to 9"},
+     {"text": "Take a cell, add its number"},
+     {"text": "Next: rival's row or column", "color": "acc"},
+     {"text": "No legal cell: game over", "color": "red", "mark": "x"},
+     {"text": "Most points wins", "color": "acc", "mark": "check"}],
+   "lines": ["I coded a two player number game. Take a cell, keep its points.", "But your next pick has to be in the same row or column your rival just picked. So every number you take opens a lane for them."]},
+  {"type": "list", "title": "5 AI bots", "items": [
+     {"text": "Random: any legal cell"},
+     {"text": "Greedy: biggest number", "color": "amb"},
+     {"text": "Spoiler: checks what it leaves"},
+     {"text": "Deep: thinks 4 moves ahead", "color": "acc"},
+     {"text": "Monte: 40 random games per move", "color": "blue"}],
+   "lines": ["Five bots. Spoiler checks what it leaves for its rival. Deep looks four moves ahead.", "And Monte plays forty random games to the end for every move, and picks the one that wins the most points on average."]},
+  {"type": "bars", "title": "Win rate, 4,000 games each", "bars": [
+     {"label": "Deep", "frac": 0.720, "display": "72.0%", "color": "acc"},
+     {"label": "Spoiler", "frac": 0.688, "display": "68.8%", "color": "acc"},
+     {"label": "Greedy", "frac": 0.536, "display": "53.6%", "color": "amb"},
+     {"label": "Monte", "frac": 0.478, "display": "47.8%", "color": "blue"},
+     {"label": "Random", "frac": 0.001, "display": "0.1%", "color": "red"}],
+   "lines": ["Every pair played a thousand games. Ten thousand in total. Deep won seventy two percent.", "Monte finished below greedy."]},
+  {"type": "bars", "title": "Greedy vs Monte, 1,000 games", "bars": [
+     {"label": "Greedy wins", "frac": 0.542, "display": "542", "color": "amb"},
+     {"label": "Monte wins", "frac": 0.399, "display": "399", "color": "blue"},
+     {"label": "Draws", "frac": 0.059, "display": "59", "color": "dim"}],
+   "lines": ["Head to head, greedy won five hundred and forty two. Monte won three hundred and ninety nine."]},
+  {"type": "bars", "title": "Rival's next pick, on average", "bars": [
+     {"label": "In Monte's imagined games", "frac": 0.324, "display": "3.2", "color": "blue"},
+     {"label": "What greedy really took", "frac": 0.531, "display": "5.3", "color": "amb", "line": 1}],
+   "lines": ["Here's why. In Monte's imaginary games, its rival moves at random, so it expected the next pick to be worth about three.", "The real greedy bot took five point three on average. Monte kept leaving big numbers in open lanes."]},
+  {"type": "terminal", "title": "The fix", "log": [
+     ["$ monte-smart: imagined rival grabs big numbers 80% of the time", "fg"],
+     ["vs greedy     716 W  213 L  71 D", "acc"],
+     ["vs old monte  710 W  239 L  51 D", "acc"],
+     ["vs deep       447 W  528 L  25 D", "red"]],
+   "lines": ["So I changed one thing. In its imagined games, the rival now grabs the biggest number eighty percent of the time.", "It beat greedy seven hundred and sixteen times out of a thousand. But it still lost to Deep."]},
+  {"type": "grab", "title": "Smart Monte vs Greedy", "a": "greedy", "b": "monte40s", "board": 2100076, "seed": 166325, "mps": "fit", "fit_end": 1.6,
+   "name_a": "greedy", "name_b": "smart", "color_a": "amb", "color_b": "acc",
+   "lines": ["Imagining the future only helps if you imagine your opponent right."]},
+  {"type": "statement", "text": "Imagine your rival right.", "sub": "Deep still wins. What game should my bots play next?", "color": "acc",
+   "lines": ["What game should my bots play next? Tell me in the comments."]}
+ ],
+ "thumbnail": {
+  "headline": "AI plays my number game",
+  "lines": ["The bot that imagines", "40 games lost to greed."],
+  "tag": "DAY 20",
+  "card_label": "greedy vs monte",
+  "card_value": "542 - 399",
+  "card_sub": "out of 1,000 games, 59 draws"
+ }
+}
