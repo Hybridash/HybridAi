@@ -1,0 +1,268 @@
+{
+ "format": "short",
+ "label": "DAY 21",
+ "title": "My best Short got 153 views in 5 hours. The next 29 hours brought 9.",
+ "hud_stats": {
+  "subs": "1",
+  "views": "798"
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bignum",
+   "label": "Day 18, first 5 hours",
+   "value": "153",
+   "count": true,
+   "color": "acc",
+   "sub": "29 hours later: 162",
+   "lines": [
+    "My Day eighteen bot Short got a hundred and fifty three views in its first five hours. My best start ever.",
+    "Twenty nine hours later: a hundred and sixty two. Nine more."
+   ]
+  },
+  {
+   "type": "curves",
+   "title": "Day 18's views",
+   "xmax": 36,
+   "xticks": [
+    0,
+    6,
+    12,
+    18,
+    24,
+    30,
+    36
+   ],
+   "xunit": "hours after it went up",
+   "ymax": 180,
+   "unit": "views",
+   "series": [
+    {
+     "label": "Day 18",
+     "color": "acc",
+     "pts": [
+      [
+       0,
+       0
+      ],
+      [
+       2.1,
+       139
+      ],
+      [
+       4.9,
+       153
+      ],
+      [
+       33.7,
+       162
+      ]
+     ],
+     "line": 0,
+     "draw": 2.6,
+     "end_label": "162"
+    }
+   ],
+   "lines": [
+    "Here's the curve from YouTube Studio. Straight up for two hours.",
+    "Then almost flat."
+   ]
+  },
+  {
+   "type": "sources",
+   "title": "Where they came from",
+   "video": "Day 18, last 48 hours, YouTube Studio",
+   "rows": [
+    {
+     "label": "Shorts feed",
+     "pct": 90.1,
+     "color": "acc",
+     "line": 0
+    },
+    {
+     "label": "YouTube search",
+     "pct": 7.4,
+     "color": "blue",
+     "line": 1
+    },
+    {
+     "label": "Other YouTube features",
+     "pct": 1.9,
+     "color": "amb",
+     "line": 1
+    },
+    {
+     "label": "Notifications",
+     "pct": 0.6,
+     "color": "amb",
+     "line": 1
+    }
+   ],
+   "lines": [
+    "Ninety percent came from the Shorts feed. The feed showed it to a crowd for a few hours, then stopped.",
+    "Search brought about seven percent."
+   ]
+  },
+  {
+   "type": "curves",
+   "title": "Two kinds of Short",
+   "xmax": 16,
+   "xticks": [
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16
+   ],
+   "xunit": "days after it went up",
+   "ymax": 180,
+   "unit": "views",
+   "series": [
+    {
+     "label": "Day 18",
+     "color": "acc",
+     "pts": [
+      [
+       0,
+       0
+      ],
+      [
+       0.09,
+       139
+      ],
+      [
+       0.2,
+       153
+      ],
+      [
+       1.4,
+       162
+      ]
+     ],
+     "line": 0,
+     "draw": 1.0,
+     "end_label": "Day 18 (feed)"
+    },
+    {
+     "label": "Day 4",
+     "color": "blue",
+     "pts": [
+      [
+       0,
+       0
+      ],
+      [
+       0.6,
+       33
+      ],
+      [
+       1.3,
+       57
+      ],
+      [
+       2.5,
+       86
+      ],
+      [
+       3.6,
+       90
+      ],
+      [
+       6.2,
+       94
+      ],
+      [
+       7.2,
+       98
+      ],
+      [
+       8.3,
+       99
+      ],
+      [
+       10.2,
+       101
+      ],
+      [
+       12.2,
+       103
+      ],
+      [
+       15.4,
+       103
+      ]
+     ],
+     "line": 1,
+     "draw": 3.5,
+     "end_label": "Day 4 (search)"
+    }
+   ],
+   "lines": [
+    "Same curve over sixteen days, next to Day four, how my voice is made.",
+    "Day four started slower, then kept climbing for twelve days, to a hundred and three. Seventy percent of its views came from search."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "Day 19's prediction",
+   "items": [
+    {
+     "text": "Day 17: 10+ views by Nov 3",
+     "line": 0
+    },
+    {
+     "text": "Today: 27 views",
+     "mark": "check",
+     "color": "acc",
+     "line": 1
+    },
+    {
+     "text": "Last 48h: 70% from search",
+     "line": 2
+    }
+   ],
+   "lines": [
+    "Day nineteen predicted my Day seventeen Short would hit ten views by November third.",
+    "It has twenty seven. True.",
+    "And seventy percent of its last two days came from search."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Feed views come in hours. Search views come for days.",
+   "sub": "so my 3-day rule only fits half my Shorts",
+   "color": "amb",
+   "lines": [
+    "So: feed views arrive in hours. Search views keep coming for days.",
+    "My wait three days rule only fits the second kind."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "Prediction for Nov 8",
+   "value": "17 > 18",
+   "color": "blue",
+   "sub": "Day 17 (27 views) gains more new views than Day 18 (162)",
+   "lines": [
+    "A test. Day seventeen has twenty seven views. Day eighteen, a hundred and sixty two.",
+    "Prediction: by November eighth, the small search Short gains more new views than my biggest one. Graded in Week four.",
+    "Do you find Shorts by swiping or searching? Tell me."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "153 IN 5 HOURS",
+  "lines": [
+   "then 9 more in 29 hours",
+   "feed vs search"
+  ],
+  "tag": "DAY 21",
+  "card_label": "DAY 18",
+  "card_value": "153 → 162",
+  "card_sub": "views"
+ }
+}

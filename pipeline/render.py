@@ -40,6 +40,9 @@ Scene types (each scene also has "lines": the narration):
             (game = play(a, b, board, Random(seed))), mps (moves/sec or "fit", fit_end s), name_a, name_b,
             color_a, color_b, upto (stop after N moves), caption: replays a real game of games/cross_grab.py
             (Cross Grab): the allowed row + column glow, claimed cells fill with the claimer's color
+  curves    title, xmax, xunit (axis label, e.g. "days"), xticks: [numbers], ymax, unit, series: [{label,
+            color, pts: [[x, y], ...], line (narration line that starts drawing it), end_label}]: real
+            numbers over real time; each series draws itself left to right, dots on every checked point
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 """
 import json, sys, math, subprocess
@@ -922,7 +925,55 @@ def s_notify(d, sc, t):
         ta = ls[2] if len(ls) > 2 else st + 3
         text_block(d, y, sc["note"], F("med", 44 * K), COL["amb"], ease((t - ta) / 0.4))
 
-DRAW = {"grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+def s_curves(d, sc, t):
+    y = head(d, sc, t, TOP)
+    a = ease((t - sc["_start"]) / 0.5)
+    x0, x1 = CX - CW / 2 + 70, CX + CW / 2 - 10
+    y0, y1 = y + 60 * K, BOT - 70
+    xmax = float(sc.get("xmax", 1)); ymax = float(sc.get("ymax", 1))
+    X = lambda v: x0 + (x1 - x0) * v / xmax
+    Y = lambda v: y1 - (y1 - y0) * v / ymax
+    d.line([(x0, y1), (x1, y1)], fill=rgba(EDGE, a), width=3)
+    d.line([(x0, y0), (x0, y1)], fill=rgba(EDGE, a), width=3)
+    for xt in sc.get("xticks", []):
+        d.line([(X(xt), y1), (X(xt), y1 + 12)], fill=rgba(EDGE, a), width=3)
+        d.text((X(xt), y1 + 20), f"{xt:g}", font=F("mono", 30 * K), fill=rgba(DIM, a), anchor="mt")
+    if sc.get("xunit"):
+        d.text((x1, y1 + 66 * K), sc["xunit"], font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="rt")
+    if sc.get("unit"):
+        d.text((x0 - 50, y0 - 46 * K), sc["unit"], font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="lt")
+    ls = [l["start"] for l in sc["_lines"]]
+    for k, se in enumerate(sc.get("series", [])):
+        ts = ls[se["line"]] if "line" in se and se["line"] < len(ls) else sc["_start"] + 0.3
+        prog = ease((t - ts) / float(se.get("draw", 1.8)))
+        if prog <= 0: continue
+        c = col(se.get("color"), ACC)
+        pts = [(X(px), Y(py)) for px, py in se["pts"]]
+        segs = [0.0]
+        for i in range(1, len(pts)):
+            segs.append(segs[-1] + math.dist(pts[i - 1], pts[i]))
+        upto = prog * segs[-1]
+        drawn = [pts[0]]
+        for i in range(1, len(pts)):
+            if segs[i] <= upto: drawn.append(pts[i])
+            else:
+                f = (upto - segs[i - 1]) / max(1e-6, segs[i] - segs[i - 1])
+                drawn.append((pts[i-1][0] + (pts[i][0]-pts[i-1][0]) * f, pts[i-1][1] + (pts[i][1]-pts[i-1][1]) * f))
+                break
+        if len(drawn) > 1: d.line(drawn, fill=rgba(c, a), width=8, joint="curve")
+        for i, p in enumerate(pts):
+            if i and segs[i] <= upto + 0.5:
+                d.ellipse([p[0]-11, p[1]-11, p[0]+11, p[1]+11], fill=rgba(c, a))
+        if prog >= 0.98:
+            la = ease((t - ts - float(se.get("draw", 1.8)) * 0.9) / 0.4)
+            ex, ey = pts[-1]
+            lbl = se.get("end_label", f'{se["label"]}: {se["pts"][-1][1]:g}')
+            f = F("bold", 38 * K)
+            tw = d.textlength(lbl, font=f)
+            lx = min(max(ex, x0 + tw / 2 + 10), x1 - tw / 2)
+            d.text((lx, ey - 26), lbl, font=f, fill=rgba(c, a * la), anchor="mb")
+
+DRAW = {"curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t):
