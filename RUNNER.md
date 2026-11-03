@@ -1,6 +1,6 @@
 # Daily runs on the owner's Mac
 
-Since 2026-11-02 the daily Short is made on the owner's Mac (a local scheduled task), because its voices come from VoiceStudio, which only runs there. The weekly video still runs in the cloud.
+Toon Shorts sound best when built on the owner's Mac, because their voices come from VoiceStudio, which only runs there. The plan is to run the daily Short from a local scheduled task here; until that is set up, the cloud routine builds it with the Kokoro fallback voices. The weekly video runs in the cloud.
 
 Layout (already set up, reuse it):
 - `~/hybridai-runner/HybridAi`: this repo. Start every run with `git pull`.
