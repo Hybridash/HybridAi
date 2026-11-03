@@ -61,7 +61,8 @@ if spec.get("thumbnail"):
     # Opening frame = the thumbnail, so whatever frame YouTube shows (and Shorts feeds) carries the hook.
     # Held for cover_seconds (default 0.6) with silence, then the video starts.
     cover = f"{out}/cover.png"
-    if short: run(f"{HERE}/thumb.py", spec_path, cover, "vertical")
+    if short and spec.get("style") == "toon": run(f"{HERE}/render.py", spec_path, out, "cover", cover)
+    elif short: run(f"{HERE}/thumb.py", spec_path, cover, "vertical")
     else: Image.open(f"{out}/thumbnail.jpg").resize((1920, 1080)).save(cover)
     hold = spec.get("cover_seconds", 0.6)
     os.rename(f"{out}/final.mp4", f"{out}/body.mp4")

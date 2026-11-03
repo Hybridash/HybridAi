@@ -1,0 +1,66 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 22",
+ "title": "Example only: a toon skit Short (human + bot), real Day 20 data",
+ "hud_stats": {
+  "subs": 1,
+  "views": 740
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "grab",
+   "title": "Greedy vs Monte",
+   "a": "greedy",
+   "b": "monte",
+   "board": 2000083,
+   "seed": 158426,
+   "mps": "fit",
+   "fit_end": 1.6,
+   "name_a": "greedy",
+   "name_b": "monte",
+   "color_a": "amb",
+   "color_b": "blue",
+   "lines": [
+    {
+     "text": "Wait. The bot that imagines the future lost?",
+     "who": "human"
+    },
+    "Yep. It plays forty imaginary games before every move. Greedy just grabs the biggest number."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Greedy vs Monte, 1,000 games",
+   "bars": [
+    {
+     "label": "Greedy wins",
+     "frac": 0.542,
+     "display": "542",
+     "color": "amb"
+    },
+    {
+     "label": "Monte wins",
+     "frac": 0.399,
+     "display": "399",
+     "color": "blue"
+    }
+   ],
+   "lines": [
+    {
+     "text": "So how bad was it?",
+     "who": "human"
+    },
+    "Greedy won five hundred and forty two. Monte won three hundred and ninety nine."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "The smart bot LOST to the greedy one",
+  "lines": [
+   "1,000 games of my number game"
+  ],
+  "tag": "DAY 22"
+ }
+}

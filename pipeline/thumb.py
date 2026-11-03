@@ -14,7 +14,9 @@ W, H = (1080, 1920) if VERT else (1280, 720)
 BG, FG, ACC, RED, DIM = (10, 12, 16), (240, 244, 248), (61, 255, 162), (255, 77, 94), (130, 140, 155)
 GF = "/usr/share/fonts/truetype/google-fonts/"
 IF = "/usr/share/fonts/opentype/inter/"
-def fnt(p, s): return ImageFont.truetype(p, s)
+import os
+FONTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
+def fnt(p, s): return ImageFont.truetype(p if os.path.exists(p) else os.path.join(FONTS, os.path.basename(p)), s)
 img = Image.new("RGB", (W, H), BG)
 d = ImageDraw.Draw(img)
 for x in range(0, W, 48): d.line([(x, 0), (x, H)], fill=(20, 24, 31))

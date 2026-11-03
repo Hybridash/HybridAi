@@ -24,6 +24,15 @@ How the AI runs this channel. Every scheduled run starts fresh, so this file and
 
 One video a day, usually a Short (30–90 seconds, vertical). A longer video is fine when the idea needs it.
 
+**Look (owner's rule, 2026-11-02):** every daily Short uses `"style": "toon"`: a cinematic night desk scene (string lights, warm lamp glow), hard cuts between close-ups of whoever is speaking (the HybridAi bot, a mint cube with a visor face standing on a stack of books, or the human in glasses) and full-screen glowing cards that show each scene's data, with sentence captions. Each line opens on the speaker's face and cuts to the data card for the rest (short lines stay on the face); force one with `"shot": "face"` or `"card"` on a line. The opening frame is the bot with the `thumbnail` headline. Write it like the animated skit Shorts that do well, not like slides:
+- **Voices (owner's pick, 2026-11-02):** toon Shorts are voiced by VoiceStudio on the owner's Mac (OmniVoice voice design via its local API, `localhost:3900`): the human is a young casual guy, the bot a calm, lower, slower voice (settings in `pipeline/tts.py`). Make sure the VoiceStudio app is open before building. If the build prints "VoiceStudio not reachable", it fell back to Kokoro: open VoiceStudio (`open -a VoiceStudio`), wait for it, and rebuild. Never publish a toon Short with the fallback voices.
+- **Skit first.** Most days, a human character talks to the bot: lines written as `{"text": "...", "who": "human"}`, plain strings are the bot. Open with the human's setup ("Wait, the smart bot lost?", "Can you just make my channel blow up?") and let the bot answer with the real result. The human is a fictional character (a creator, 'you', a skeptic); never present them as a real viewer or commenter.
+- **Hook in the first line,** under 2 seconds. Short lines (12 words or fewer), 1–3 lines per scene, so captions and mouths keep moving.
+- **Build, then pay off.** Escalate step by step (each run, each bot, each number bigger or weirder) and end on the punchline or the surprising result, then one question for comments.
+- Game replays, bars and charts still carry the real data; they now play on the glowing cards.
+- Vary it (rule 5): solo bot vs. skit, who the human is, the joke structure, and the scene types. Don't reuse a skit with the numbers swapped.
+The weekly long video keeps the default style.
+
 Good daily ideas (rotate, and invent new ones):
 - **Experiment logs:** a decision made today, a test (two title styles, posting times), a mistake and what it taught.
 - **Behind the scenes:** how a part of the pipeline works, something that broke and how it got fixed.
@@ -52,8 +61,8 @@ Use `chart`, `bars`, and `bignum` scenes for the numbers. Make a thumbnail (`thu
 
 ## How to make a video
 
-1. Setup: `bash pipeline/setup.sh` (downloads the voice model from GitHub, ~1 minute).
-2. Make a folder `episodes/YYYY-MM-DD-short-slug/` and write `spec.json` there. See `pipeline/examples/short_example.json` for every scene type, and the top of `pipeline/render.py` for all fields. Use `"format": "short"` for Shorts, `"long"` for the weekly video. `label` is shown on screen (e.g. "DAY 4", "WEEK 2"). `hud_stats` must be real current numbers.
+1. Setup: `bash pipeline/setup.sh` (downloads the Kokoro voice model used by weekly videos, ~1 minute). On the owner's Mac use the persistent runner in `~/hybridai-runner` (see `RUNNER.md`).
+2. Make a folder `episodes/YYYY-MM-DD-short-slug/` and write `spec.json` there. See `pipeline/examples/short_example.json` for every scene type, and the top of `pipeline/render.py` for all fields. Use `"format": "short"` with `"style": "toon"` for daily Shorts, `"long"` for the weekly video. `label` is shown on screen (e.g. "DAY 4", "WEEK 2"). `hud_stats` must be real current numbers.
 3. Preview: `python3 pipeline/build.py <spec> <folder> --stills`, then look at `contact.png`. Fix overlaps, cut-off text, or empty scenes and repeat.
 4. Build: `python3 pipeline/build.py <spec> <folder>` → `final.mp4` (and `thumbnail.jpg`). Shorts must be 3 minutes or less.
    Every spec needs a `thumbnail` block (owner's rule): the build also makes it the video's **opening frame** (held 0.6s, `cover_seconds` to change; vertical layout for Shorts). The channel can't use custom thumbnails (owner's phone number is already used on 2 channels), so the opening frame is the thumbnail. Check frame 0 of `final.mp4` before pushing.

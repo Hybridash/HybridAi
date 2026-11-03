@@ -3,6 +3,7 @@
 usage:
   python3 render.py <spec.json> <workdir> part <i> <n>     render frames part i of n -> part{i}.mp4
   python3 render.py <spec.json> <workdir> still <t> [<t>...] save still_<t>.png for checking
+  python3 render.py <spec.json> <workdir> cover <out.png>     toon Shorts: the opening frame (bot + headline)
 
 Scene types (each scene also has "lines": the narration):
   title     kicker, title, sub
@@ -44,8 +45,13 @@ Scene types (each scene also has "lines": the narration):
             color, pts: [[x, y], ...], line (narration line that starts drawing it), end_label}]: real
             numbers over real time; each series draws itself left to right, dots on every checked point
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
+
+"style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
+a floating screen above it, and big word-by-word captions. Lines written as {"text", "who": "human"}
+add a human character who talks with the bot (a skit); whoever is speaking bounces and moves its mouth.
 """
-import json, sys, math, subprocess
+import json, os, sys, math, subprocess
+HERE = os.path.dirname(os.path.abspath(__file__))
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 SPEC = json.load(open(sys.argv[1]))
@@ -74,10 +80,12 @@ _fc = {}
 def F(name, size):
     k = (name, int(size))
     if k not in _fc:
-        _fc[k] = ImageFont.truetype({"head": GF + "Poppins-Bold.ttf", "med": GF + "Poppins-Medium.ttf",
-                                    "body": IF + "Inter-Medium.otf", "bold": IF + "Inter-Bold.otf",
-                                    "black": IF + "Inter-Black.otf", "mono": DJ + "DejaVuSansMono.ttf",
-                                    "monob": DJ + "DejaVuSansMono-Bold.ttf", "sym": DJ + "DejaVuSans-Bold.ttf"}[name], int(size))
+        p = {"head": GF + "Poppins-Bold.ttf", "med": GF + "Poppins-Medium.ttf",
+             "body": IF + "Inter-Medium.otf", "bold": IF + "Inter-Bold.otf",
+             "black": IF + "Inter-Black.otf", "mono": DJ + "DejaVuSansMono.ttf",
+             "monob": DJ + "DejaVuSansMono-Bold.ttf", "sym": DJ + "DejaVuSans-Bold.ttf"}[name]
+        if not os.path.exists(p): p = os.path.join(HERE, "fonts", os.path.basename(p))  # bundled copy (owner's Mac)
+        _fc[k] = ImageFont.truetype(p, int(size))
     return _fc[k]
 
 def ease(x):
@@ -976,7 +984,7 @@ def s_curves(d, sc, t):
 DRAW = {"curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
-def hud(img, t):
+def hud(img, t, FG=FG, DIM=DIM):
     d = ImageDraw.Draw(img)
     pulse = 0.5 + 0.5 * math.sin(t * 4)
     y = 120 if SHORT else 61
@@ -1007,6 +1015,216 @@ def captions(img, t):
     for i, s in enumerate(lines):
         d.text((W / 2, y0 + i * lh), s, font=f, fill=FG, anchor="mt")
 
+# ---------- toon style: a night desk scene, close-up cuts to whoever speaks, glowing data cards ----------
+TOON = SPEC.get("style") == "toon"
+SKIT = any(l.get("who") == "human" for l in LINES)
+AMB, GLOW = COL["amb"], (255, 138, 76)
+CARD_BOX = (70, 420, W - 70, 1620) if SHORT else (300, 150, W - 300, H - 150)
+CROP = (0, 230, W, 1300) if SHORT else (0, 100, W, H - 150)
+
+def shade(c, k): return tuple(max(0, min(255, int(v * k))) for v in c[:3])
+
+def toon_stage():
+    """Blurred night background (sky, string lights, a lit desk), lamp glow + vignette overlay, card shot base."""
+    bg = Image.new("RGB", (W, H))
+    d = ImageDraw.Draw(bg)
+    hz = int(H * 0.58)
+    for y in range(hz):
+        k = y / hz
+        d.line([(0, y), (W, y)], fill=(int(12 + 34 * k), int(20 + 52 * k), int(46 + 82 * k)))
+    d.rectangle([0, hz, W, H], fill=(70, 46, 34))
+    d.polygon([(0, hz + 40), (W, hz + 10), (W, H), (0, H)], fill=(132, 88, 56))   # desk top
+    d.ellipse([W * 0.08, H * 0.1, W * 0.22, H * 0.1 + W * 0.14], fill=(250, 226, 170))  # moon
+    for i in range(3):  # dim monitors behind
+        x = W * (0.55 + i * 0.22)
+        d.rounded_rectangle([x, hz - H * 0.22, x + W * 0.2, hz - 10], radius=12, fill=(18, 24, 40), outline=(40, 56, 90), width=4)
+        for j in range(6): d.line([(x + 20, hz - H * 0.2 + 30 + j * 28), (x + 20 + (j * 37 % 90) + 40, hz - H * 0.2 + 30 + j * 28)], fill=(70, 110, 160), width=6)
+    bg = bg.filter(ImageFilter.GaussianBlur(22))
+    lights = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    dl = ImageDraw.Draw(lights)
+    for i in range(14):  # string lights sagging across the top, out of focus
+        x = W * (i / 13)
+        y = H * 0.07 + math.sin(i / 13 * math.pi) * H * 0.07
+        r = W * 0.035
+        dl.ellipse([x - r, y - r, x + r, y + r], fill=(255, 214, 150, 170))
+    bg.paste(lights.filter(ImageFilter.GaussianBlur(14)), (0, 0), lights.filter(ImageFilter.GaussianBlur(14)))
+    over = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    lamp = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(lamp).ellipse([W * 0.55, H * 0.2, W * 1.4, H * 0.75], fill=90)
+    over = Image.composite(Image.new("RGBA", (W, H), (255, 160, 80, 110)), over, lamp.filter(ImageFilter.GaussianBlur(160)))
+    vig = Image.new("L", (W, H), 255)
+    ImageDraw.Draw(vig).ellipse([-W * 0.3, -H * 0.15, W * 1.3, H * 1.15], fill=0)
+    over.alpha_composite(Image.composite(Image.new("RGBA", (W, H), (4, 6, 14, 200)), Image.new("RGBA", (W, H), (0, 0, 0, 0)), vig.filter(ImageFilter.GaussianBlur(180))))
+    # card shot: darker background, a glowing card, a small "hybridai" tag
+    card = Image.blend(bg, Image.new("RGB", (W, H), (6, 8, 16)), 0.55)
+    x0, y0, x1, y1 = CARD_BOX
+    g = Image.new("L", (W, H), 0)
+    ImageDraw.Draw(g).rounded_rectangle(CARD_BOX, radius=30, outline=255, width=14)
+    card = Image.composite(Image.new("RGB", (W, H), GLOW), card, g.filter(ImageFilter.GaussianBlur(20)).point(lambda v: v * 0.6))
+    dc = ImageDraw.Draw(card)
+    dc.rounded_rectangle(CARD_BOX, radius=30, fill=(10, 13, 24), outline=shade(GLOW, 0.9), width=3)
+    tag = "hybridai"
+    tw = dc.textlength(tag, font=F("bold", 30))
+    dc.rounded_rectangle([x0, y0 - 66, x0 + tw + 56, y0 - 18], radius=12, fill=(30, 18, 14), outline=GLOW, width=3)
+    dc.ellipse([x0 + 16, y0 - 48, x0 + 28, y0 - 36], fill=GLOW)
+    dc.text((x0 + 38, y0 - 42), tag, font=F("bold", 30), fill=(255, 214, 190), anchor="lm")
+    return bg, over, card
+
+def block(d, x, y, w, h, dep, c, r=0):
+    """A box seen slightly from above and the right: top and side faces, then the front."""
+    dx, dy = dep, -dep * 0.55
+    d.polygon([(x, y), (x + dx, y + dy), (x + w + dx, y + dy), (x + w, y)], fill=shade(c, 1.18))
+    d.polygon([(x + w, y), (x + w + dx, y + dy), (x + w + dx, y + h + dy), (x + w, y + h)], fill=shade(c, 0.66))
+    d.rounded_rectangle([x, y, x + w, y + h], radius=r, fill=c)
+
+def mouth(d, cx, cy, w, talk, t, c):
+    o = talk * (0.5 + 0.5 * math.sin(t * 23)) * (0.6 + 0.4 * math.sin(t * 7.3))
+    h = max(w * 0.14, w * 0.55 * o)
+    d.rounded_rectangle([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2], radius=h / 2, fill=c)
+
+def draw_bot(d, cx, fy, s, t, talk):
+    """The HybridAi bot: a mint cube with a visor face, an antenna light, stubby arms and feet."""
+    hop = abs(math.sin(t * 9)) * s * 0.035 * talk + math.sin(t * 2.1) * s * 0.015
+    dep, x = s * 0.22, cx - s / 2 - s * 0.11
+    y = fy - s * 1.14 - hop
+    d.ellipse([cx - s * 0.48, fy - s * 0.05, cx + s * 0.48, fy + s * 0.05], fill=(176, 128, 52))  # shadow on the top book
+    body, dark = (64, 196, 146), (30, 104, 80)
+    for fx in (x + s * 0.2, x + s * 0.62):
+        block(d, fx, y + s, s * 0.2, s * 0.12 + hop, s * 0.08, dark)
+    wave = math.sin(t * 9) * s * 0.05 * talk
+    block(d, x - s * 0.13, y + s * 0.5 - wave, s * 0.13, s * 0.3, s * 0.06, shade(body, 0.85), r=6)
+    block(d, x, y, s, s, dep, body, r=int(s * 0.07))
+    block(d, x + s + dep * 0.8, y + s * 0.42 + wave, s * 0.13, s * 0.3, s * 0.06, shade(body, 0.85), r=6)
+    ax, ay = x + s / 2 + dep / 2, y - dep * 0.55 / 2
+    d.line([(ax, ay), (ax, ay - s * 0.24)], fill=dark, width=max(4, int(s * 0.03)))
+    p = 0.5 + 0.5 * math.sin(t * 4)
+    orb = (int(120 + 135 * p), int(30 + 47 * p), int(40 + 54 * p))
+    r = s * 0.065
+    d.ellipse([ax - r * 1.8, ay - s * 0.24 - r * 1.8, ax + r * 1.8, ay - s * 0.24 + r * 1.8], fill=orb + (60,))
+    d.ellipse([ax - r, ay - s * 0.24 - r, ax + r, ay - s * 0.24 + r], fill=orb)
+    d.rounded_rectangle([x + s * 0.12, y + s * 0.16, x + s * 0.88, y + s * 0.7], radius=s * 0.1, fill=(18, 28, 34))
+    blink = (t % 3.7) < 0.12
+    for ex in (x + s * 0.34, x + s * 0.66):
+        eh = s * 0.02 if blink else s * 0.17
+        d.rounded_rectangle([ex - s * 0.055, y + s * 0.38 - eh / 2, ex + s * 0.055, y + s * 0.38 + eh / 2], radius=s * 0.04, fill=ACC)
+    mouth(d, x + s * 0.5, y + s * 0.585, s * 0.2, talk, t, ACC)
+    for j in range(3):
+        d.ellipse([x + s * (0.38 + j * 0.1), y + s * 0.8, x + s * (0.44 + j * 0.1), y + s * 0.86], fill=AMB if j == int(t * 3) % 3 else shade(body, 0.7))
+
+def draw_human(d, cx, fy, s, t, talk):
+    """A blocky person with glasses and a mustard shirt, for skits (a creator, 'you', a skeptic)."""
+    hop = abs(math.sin(t * 8)) * s * 0.02 * talk + math.sin(t * 1.8 + 1) * s * 0.008
+    shirt, skin, hair = (214, 158, 62), (232, 178, 140), (120, 58, 34)
+    by = fy - s * 1.15 - hop
+    gest = math.sin(t * 7) * s * 0.04 * talk
+    block(d, cx - s * 0.5, by + s * 0.08 - gest, s * 0.13, s * 0.45, s * 0.06, shade(shirt, 0.85), r=6)
+    block(d, cx - s * 0.38, by, s * 0.78, s * 0.68, s * 0.12, shirt, r=int(s * 0.06))
+    d.polygon([(cx - s * 0.08, by), (cx + s * 0.02, by + s * 0.14), (cx + s * 0.12, by)], fill=(236, 230, 214))
+    block(d, cx + s * 0.5, by + s * 0.02 + gest, s * 0.13, s * 0.45, s * 0.06, shade(shirt, 0.85), r=6)
+    block(d, cx - s * 0.1, by - s * 0.1, s * 0.16, s * 0.12, s * 0.05, shade(skin, 0.9))  # neck
+    hs = s * 0.56
+    hx, hy = cx - hs / 2 - s * 0.04, by - hs * 0.98
+    block(d, hx, hy, hs, hs, s * 0.12, skin, r=int(s * 0.04))
+    d.polygon([(hx, hy), (hx + s * 0.12, hy - s * 0.066), (hx + hs + s * 0.12, hy - s * 0.066), (hx + hs, hy)], fill=hair)
+    for k in range(6):  # spiky fringe
+        sx = hx + hs * k / 5.5
+        d.polygon([(sx, hy + hs * 0.2), (sx + hs * 0.1, hy - hs * 0.12), (sx + hs * 0.2, hy + hs * 0.2)], fill=hair)
+    d.rectangle([hx, hy, hx + hs, hy + hs * 0.16], fill=hair)
+    blink = ((t + 1.3) % 4.1) < 0.12
+    for ex in (hx + hs * 0.31, hx + hs * 0.69):
+        eh = hs * 0.02 if blink else hs * 0.1
+        d.ellipse([ex - hs * 0.05, hy + hs * 0.46 - eh / 2, ex + hs * 0.05, hy + hs * 0.46 + eh / 2], fill=(70, 70, 110))
+        d.rectangle([ex - hs * 0.13, hy + hs * 0.36, ex + hs * 0.13, hy + hs * 0.56], outline=(26, 22, 22), width=max(3, int(hs * 0.025)))
+    d.line([(hx + hs * 0.44, hy + hs * 0.44), (hx + hs * 0.56, hy + hs * 0.44)], fill=(26, 22, 22), width=max(3, int(hs * 0.02)))
+    mouth(d, hx + hs * 0.5, hy + hs * 0.76, hs * 0.18, talk, t, (110, 46, 40))
+
+def books(d, cx, fy, w):
+    block(d, cx - w * 0.55, fy, w * 1.1, w * 0.16, w * 0.2, (226, 176, 70), r=4)
+    block(d, cx - w * 0.6, fy + w * 0.16, w * 1.2, w * 0.18, w * 0.2, (170, 56, 46), r=4)
+    block(d, cx - w * 0.62, fy + w * 0.34, w * 1.24, w * 0.2, w * 0.2, (40, 46, 70), r=4)
+
+def shot_for(t):
+    """(kind, who, progress) for the frame at t: 'face' = close-up of the speaker, 'card' = the data."""
+    cur = next((l for l in LINES if l["start"] - 0.12 <= t < l["end"] + gap_after(l)), None)
+    if not cur: return "card", "bot", 0, None
+    sc = SC[cur["scene"]]
+    i = sc["_lines"].index(cur)
+    ln = sc["lines"][i]
+    kind = ln.get("shot") if isinstance(ln, dict) else None
+    p = (t - cur["start"]) / max(0.1, cur["end"] - cur["start"])
+    if not kind:
+        # the speaker's close-up first, then cut to the data for the rest of the line (short lines stay on the face)
+        d = cur["end"] - cur["start"]
+        kind = "face" if d < 1.8 or t - cur["start"] < max(1.2, d * 0.45) else "card"
+    return kind, cur.get("who", "bot"), p, cur
+
+def gap_after(l):
+    nxt = next((m for m in LINES if m["start"] > l["start"]), None)
+    return (nxt["start"] - l["end"]) if nxt else 9
+
+def sentence_caption(img, cur, y):
+    if not cur: return
+    d = ImageDraw.Draw(img)
+    f = F("bold", 52 if SHORT else 44)
+    ls = wrap(d, cur["text"], f, W * (0.82 if SHORT else 0.6))
+    for i, s in enumerate(ls):
+        d.text((CX, y + i * f.size * 1.2), s, font=f, fill=(255, 248, 236), anchor="mt", stroke_width=4, stroke_fill=(16, 12, 20))
+
+def toon_frame(t, sc, layer):
+    kind, who, p, cur = shot_for(t)
+    talking = cur.get("who", "bot") if cur and cur["start"] <= t <= cur["end"] else None
+    if kind == "card":
+        img = CARD.copy().convert("RGBA")
+        x0, y0, x1, y1 = CARD_BOX
+        src = layer.crop(CROP)
+        k = min((x1 - x0 - 40) / src.width, (y1 - y0 - 40) / src.height) * (0.95 + 0.05 * ease((t - sc["_start"]) / 0.35))
+        src = src.resize((int(src.width * k), int(src.height * k)), Image.LANCZOS)
+        img.alpha_composite(src, (int((x0 + x1 - src.width) / 2), int((y0 + y1 - src.height) / 2)))
+        sentence_caption(img, cur, 110 if SHORT else 30)
+    else:
+        img = BG_IMG.copy().convert("RGBA")
+        d = ImageDraw.Draw(img, "RGBA")
+        z = 1 + 0.04 * p  # slow push-in during the close-up
+        if who == "human":
+            draw_human(d, CX + W * 0.04, H * (1.08 if SHORT else 1.3), W * (0.9 if SHORT else 0.5) * z, t, 1.0 if talking == "human" else 0.0)
+        else:
+            s = W * (0.46 if SHORT else 0.26) * z
+            fy = H * 0.68
+            books(d, CX, fy, s * 0.9)
+            draw_bot(d, CX, fy, s, t, 1.0 if talking == "bot" else 0.0)
+        img.alpha_composite(OVER)
+        sentence_caption(img, cur, H * 0.1 if SHORT else H * 0.06)
+    d = ImageDraw.Draw(img)
+    chip = f"● HybridAi · {SPEC.get('label', '')}" + "".join(f" · {k} {v}" for k, v in (SPEC.get("hud_stats") or {}).items())
+    d.text((CX, H - (110 if SHORT else 40)), chip, font=F("bold", 30 if SHORT else 26), fill=(230, 220, 205), anchor="mm", stroke_width=3, stroke_fill=(10, 8, 14))
+    d.rectangle([0, 0, int(W * t / DUR), 6], fill=GLOW)
+    return img.convert("RGB")
+
+def toon_cover():
+    """Opening frame / thumbnail for toon Shorts: the bot on its books, the headline above it."""
+    th = SPEC.get("thumbnail", {})
+    img = BG_IMG.copy().convert("RGBA")
+    d = ImageDraw.Draw(img, "RGBA")
+    s = W * 0.4
+    books(d, CX, H * 0.8, s * 0.9)
+    draw_bot(d, CX, H * 0.8, s, 0.5, 0.0)
+    img.alpha_composite(OVER)
+    d = ImageDraw.Draw(img)
+    f = fit_font(d, th.get("headline", SPEC.get("title", "")), "head", 120, W * 0.86, 4)
+    y = H * 0.08
+    for ln in wrap(d, th.get("headline", SPEC.get("title", "")), f, W * 0.86):
+        d.text((CX, y), ln, font=f, fill=(255, 248, 236), anchor="mt", stroke_width=8, stroke_fill=(16, 12, 20))
+        y += f.size * 1.12
+    for ln in th.get("lines", [])[:1]:
+        f2 = fit_font(d, ln, "bold", 60, W * 0.86, 2)
+        for l2 in wrap(d, ln, f2, W * 0.86):
+            d.text((CX, y + 24), l2, font=f2, fill=AMB, anchor="mt", stroke_width=5, stroke_fill=(16, 12, 20))
+            y += f2.size * 1.2
+    d.text((CX, H - 110), f"● HybridAi · {SPEC.get('label', '')}", font=F("bold", 34), fill=(230, 220, 205), anchor="mm", stroke_width=3, stroke_fill=(10, 8, 14))
+    return img.convert("RGB")
+
+if TOON: BG_IMG, OVER, CARD = toon_stage()
+
 def frame(t):
     img = base.copy().convert("RGBA")
     i = next((k for k, s in enumerate(SC) if t < s["_end"]), len(SC) - 1)
@@ -1017,6 +1235,7 @@ def frame(t):
     if fo < 1:
         r, g, b, al = layer.split()
         layer = Image.merge("RGBA", (r, g, b, al.point(lambda v: int(v * fo))))
+    if TOON: return toon_frame(t, sc, layer)
     img.alpha_composite(layer)
     hud(img, t)
     captions(img, t)
@@ -1024,6 +1243,9 @@ def frame(t):
 
 if __name__ == "__main__":
     mode = sys.argv[3]
+    if mode == "cover":
+        toon_cover().save(sys.argv[4])
+        sys.exit()
     if mode == "still":
         for tt in sys.argv[4:]:
             frame(float(tt)).save(f"{WD}/still_{tt}.png")
