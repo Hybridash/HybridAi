@@ -1,0 +1,312 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 22",
+ "title": "AI bots play my bidding game. The champion lost to a bot that skips 6 of 9 cards.",
+ "hud_stats": {
+  "subs": 1,
+  "views": 825
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bid",
+   "title": "Value vs Big Three",
+   "a": "value",
+   "b": "big3",
+   "seed": 9,
+   "rps": "fit",
+   "fit_end": 1.4,
+   "name_a": "value",
+   "name_b": "big three",
+   "color_a": "acc",
+   "color_b": "amb",
+   "lines": [
+    {
+     "text": "Wait. Your best bot lost to that one?",
+     "who": "human"
+    },
+    {
+     "text": "That one ignores six of the nine cards. And it still won.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "title": "My game: Coin Bid",
+   "items": [
+    {
+     "text": "Each bot: 100 coins"
+    },
+    {
+     "text": "9 cards, worth 1 to 9 points"
+    },
+    {
+     "text": "Secret bids: higher one wins",
+     "color": "amb"
+    },
+    {
+     "text": "Tie: nobody gets it",
+     "color": "red",
+     "mark": "x"
+    },
+    {
+     "text": "23 points wins",
+     "color": "acc",
+     "mark": "check"
+    }
+   ],
+   "lines": [
+    {
+     "text": "Okay. What's the game?",
+     "who": "human"
+    },
+    "Two bots, a hundred coins each. Nine cards, worth one to nine points.",
+    "Secret bids. The higher bid pays and takes the points."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "6 AI bots",
+   "items": [
+    {
+     "text": "Random, Even, All-in"
+    },
+    {
+     "text": "Value: bigger card, bigger bid",
+     "color": "acc",
+     "line": 0
+    },
+    {
+     "text": "Big Three: bids on 7, 8, 9 only",
+     "color": "amb",
+     "line": 1
+    },
+    {
+     "text": "Mirror: rival's last bid + 1",
+     "color": "blue",
+     "line": 2
+    }
+   ],
+   "lines": [
+    "Six bots. Value bids more on bigger cards.",
+    "Big Three only bids on the seven, eight and nine.",
+    "Mirror copies its rival's last bid, plus one."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Win rate, 5,000 games each",
+   "bars": [
+    {
+     "label": "Value",
+     "frac": 0.875,
+     "display": "87.5%",
+     "color": "acc"
+    },
+    {
+     "label": "Big Three",
+     "frac": 0.647,
+     "display": "64.7%",
+     "color": "amb"
+    },
+    {
+     "label": "Even",
+     "frac": 0.533,
+     "display": "53.3%"
+    },
+    {
+     "label": "Mirror",
+     "frac": 0.384,
+     "display": "38.4%",
+     "color": "blue"
+    },
+    {
+     "label": "Random",
+     "frac": 0.353,
+     "display": "35.3%"
+    },
+    {
+     "label": "All-in",
+     "frac": 0.161,
+     "display": "16.1%",
+     "color": "red"
+    }
+   ],
+   "lines": [
+    "Fifteen thousand games. Value won eighty seven and a half percent.",
+    {
+     "text": "So Value's the champion. Done.",
+     "who": "human"
+    }
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Value vs Big Three, 1,000 games",
+   "bars": [
+    {
+     "label": "Big Three wins",
+     "frac": 0.589,
+     "display": "589",
+     "color": "amb"
+    },
+    {
+     "label": "Value wins",
+     "frac": 0.411,
+     "display": "411",
+     "color": "acc"
+    }
+   ],
+   "lines": [
+    "Not quite. Head to head, Big Three won five eighty nine to four eleven."
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "Value's average spend on cards 1 to 6",
+   "value": "81",
+   "count": true,
+   "color": "amb",
+   "sub": "coins. Big Three bid 0 on them.",
+   "lines": [
+    {
+     "text": "How? Value bids smarter!",
+     "who": "human"
+    },
+    "It paid eighty one coins, on average, for the small cards.",
+    "Big Three bid zero on those. One coin would have won them."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "Why it ran short",
+   "log": [
+    [
+     "$ value vs big3, 1,000 games",
+     "fg"
+    ],
+    [
+     "cards 1 to 6 add up to 21 points",
+     "fg"
+    ],
+    [
+     "23 wins, so value needs one big card",
+     "amb"
+    ],
+    [
+     "value's avg bid on 7, 8, 9:   24.8",
+     "red"
+    ],
+    [
+     "big3's bids:                  33+",
+     "acc"
+    ]
+   ],
+   "lines": [
+    "The small cards only add up to twenty one. You need twenty three.",
+    "On big cards, Value bid about twenty five. Big Three bid thirty three."
+   ]
+  },
+  {
+   "type": "bid",
+   "title": "Mirror vs Big Three",
+   "a": "mirror",
+   "b": "big3",
+   "seed": 5,
+   "rps": "fit",
+   "fit_end": 1.4,
+   "name_a": "mirror",
+   "name_b": "big three",
+   "color_a": "blue",
+   "color_b": "amb",
+   "lines": [
+    {
+     "text": "So Big Three can't be beaten?",
+     "who": "human"
+    },
+    "Mirror beats it. Five forty nine to four forty three.",
+    "Every big card Mirror took, it won by exactly one coin."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "Who beats who, 1,000 games",
+   "items": [
+    {
+     "text": "Value > Mirror   978-14",
+     "color": "acc",
+     "mark": "check",
+     "line": 0
+    },
+    {
+     "text": "Mirror > Big 3   549-443",
+     "color": "blue",
+     "mark": "check",
+     "line": 0
+    },
+    {
+     "text": "Big 3 > Value   589-411",
+     "color": "amb",
+     "mark": "check",
+     "line": 0
+    }
+   ],
+   "lines": [
+    "And Value crushes Mirror, nine seventy eight to fourteen.",
+    {
+     "text": "That's rock paper scissors!",
+     "who": "human"
+    },
+    "Exactly. A circle. Every bot loses to someone."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "The fix: Counter",
+   "log": [
+    [
+     "$ counter: bids like value, max rival top bid + 1",
+     "fg"
+    ],
+    [
+     "vs big3    772 W  228 L",
+     "acc"
+    ],
+    [
+     "vs mirror  430 W  181 L  389 D",
+     "acc"
+    ],
+    [
+     "vs value    93 W  861 L",
+     "red"
+    ]
+   ],
+   "lines": [
+    {
+     "text": "So build one bot that beats them all.",
+     "who": "human"
+    },
+    "I tried. Counter beat Big Three seven seventy two to two twenty eight.",
+    "Then Value beat Counter, eight sixty one to ninety three."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "No bot beats them all.",
+   "sub": "What bot would break the circle?",
+   "color": "amb",
+   "lines": [
+    "What bot would you add to break the circle? Tell me in the comments."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "My best bot LOST to the lazy one",
+  "lines": [
+   "It skips 6 of the 9 cards"
+  ],
+  "tag": "DAY 22"
+ }
+}

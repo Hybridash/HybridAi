@@ -41,6 +41,10 @@ Scene types (each scene also has "lines": the narration):
             (game = play(a, b, board, Random(seed))), mps (moves/sec or "fit", fit_end s), name_a, name_b,
             color_a, color_b, upto (stop after N moves), caption: replays a real game of games/cross_grab.py
             (Cross Grab): the allowed row + column glow, claimed cells fill with the claimer's color
+  bid       title, a, b (bots), seed (game = play(a, b, Random(seed), trace=True)), rps (rounds/sec or "fit",
+            fit_end s), name_a, name_b, color_a, color_b, caption: replays a real game of games/coin_bid.py
+            (Coin Bid): the deck strip fills with who took each card, the prize card flips up, both bids
+            reveal, the winner's coins drop
   curves    title, xmax, xunit (axis label, e.g. "days"), xticks: [numbers], ymax, unit, series: [{label,
             color, pts: [[x, y], ...], line (narration line that starts drawing it), end_label}]: real
             numbers over real time; each series draws itself left to right, dots on every checked point
@@ -981,7 +985,98 @@ def s_curves(d, sc, t):
             lx = min(max(ex, x0 + tw / 2 + 10), x1 - tw / 2)
             d.text((lx, ey - 26), lbl, font=f, fill=rgba(c, a * la), anchor="mb")
 
-DRAW = {"curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_bid = {}
+def bid_trace(sc):
+    k = (sc["a"], sc["b"], sc["seed"])
+    if k not in _bid:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import coin_bid as G
+        pts, log = G.play(sc["a"], sc["b"], _r.Random(sc["seed"]), trace=True)
+        _bid[k] = (G, pts, log)
+    return _bid[k]
+
+def s_bid(d, sc, t):
+    G, pts, log = bid_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    n = len(log)
+    rps = sc.get("rps", 0.8)
+    if rps == "fit":
+        rps = max(0.3, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    x = max(0.0, t - sc["_start"] - 0.5) * rps
+    i = min(n, int(x)); ph = x - i if i < n else 1.0   # round i is in progress, phase 0-1
+    done = log[:i]
+    cols = [col(sc.get("color_a", "acc")), col(sc.get("color_b", "blue"))]
+    na, nb = sc.get("name_a", sc["a"]).upper(), sc.get("name_b", sc["b"]).upper()
+    prev = done[-1] if done else None
+    coins = prev[3] if prev else [G.START, G.START]
+    score = prev[4] if prev else [0, 0]
+    cur = log[i] if i < n else None
+    if cur and ph >= 0.75:  # winner of the current round shown
+        coins, score = cur[3], cur[4]
+    # deck strip: past cards, colored by who took them
+    sw = CW / 9
+    for j in range(9):
+        bx = (CX - CW / 2 + j * sw + 6, y, CX - CW / 2 + (j + 1) * sw - 6, y + sw * 1.25)
+        if j < len(done) or (cur and j == i and ph >= 0.75):
+            c_, b_, w_ = log[j][0], log[j][1], log[j][2]
+            cc = cols[w_] if w_ is not None else DIM
+            d.rounded_rectangle(bx, radius=10, fill=rgba(tuple(int(v * 0.25) for v in cc), a), outline=rgba(cc, a), width=3)
+            d.text(((bx[0] + bx[2]) / 2, (bx[1] + bx[3]) / 2), str(c_), font=F("black", sw * 0.55), fill=rgba(cc, a), anchor="mm")
+        else:
+            d.rounded_rectangle(bx, radius=10, fill=rgba((24, 28, 36), a), outline=rgba(EDGE, a), width=2)
+    y += sw * 1.25 + 40 * K
+    # current card in the middle, players on each side
+    cw_, ch_ = 230 * K, 320 * K
+    cy0 = y + 20
+    colx = [CX - CW / 2, CX + CW / 2]
+    for p, nm in enumerate((na, nb)):
+        anc = "l" if p == 0 else "r"
+        xx = colx[p]
+        d.text((xx, cy0), nm, font=F("monob", 40 * K), fill=rgba(cols[p], a), anchor=anc + "t")
+        d.text((xx, cy0 + 50 * K), f"{score[p]} pts", font=F("black", 64 * K), fill=rgba(FG, a), anchor=anc + "t")
+        bw = (CW - cw_) / 2 - 40
+        bx0 = xx if p == 0 else xx - bw
+        by0 = cy0 + 140 * K
+        d.rounded_rectangle([bx0, by0, bx0 + bw, by0 + 28], radius=14, fill=rgba((30, 34, 44), a))
+        fw = bw * coins[p] / G.START
+        if fw > 0:
+            fx0 = bx0 if p == 0 else bx0 + bw - fw
+            d.rounded_rectangle([fx0, by0, fx0 + fw, by0 + 28], radius=14, fill=rgba(COL["amb"], a))
+        d.text((xx, by0 + 44), f"{coins[p]} coins", font=F("mono", 34 * K), fill=rgba(COL["amb"], a), anchor=anc + "t")
+        if cur and ph >= 0.4:
+            bv = cur[1][p]
+            win = ph >= 0.75 and cur[2] == p
+            tie = ph >= 0.75 and cur[2] is None
+            txt = f"BID {bv}"
+            fb = F("black", 58 * K)
+            ty = by0 + 110 * K
+            tw = d.textlength(txt, font=fb)
+            rx0 = xx if p == 0 else xx - tw - 40
+            oc = cols[p] if win else (DIM if (ph >= 0.75) else FG)
+            d.rounded_rectangle([rx0, ty, rx0 + tw + 40, ty + fb.size * 1.3], radius=14, fill=rgba((16, 20, 28), a), outline=rgba(oc, a), width=5 if win else 2)
+            d.text((rx0 + 20 + tw / 2, ty + fb.size * 0.65), txt, font=fb, fill=rgba(oc if win or tie or ph < 0.75 else DIM, a), anchor="mm")
+    if cur:
+        k_ = ease(min(1.0, ph / 0.2))
+        bx = (CX - cw_ / 2, cy0 + (1 - k_) * 60, CX + cw_ / 2, cy0 + ch_ + (1 - k_) * 60)
+        cc = COL["amb"] if cur[0] >= 7 else FG
+        if ph >= 0.75: cc = cols[cur[2]] if cur[2] is not None else DIM
+        d.rounded_rectangle(bx, radius=22, fill=rgba((22, 26, 36), a * k_), outline=rgba(cc, a * k_), width=6)
+        d.text((CX, (bx[1] + bx[3]) / 2 - 10), str(cur[0]), font=F("black", 170 * K), fill=rgba(cc, a * k_), anchor="mm")
+        d.text((CX, bx[3] - 30), "POINTS", font=F("bold", 28 * K), fill=rgba(DIM, a * k_), anchor="mb")
+        if ph >= 0.75 and cur[2] is None:
+            d.text((CX, bx[3] + 20), "TIE: NOBODY", font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="mt")
+    else:
+        res = 0 if pts[0] == pts[1] else (1 if pts[0] > pts[1] else 2)
+        txt = "DRAW" if res == 0 else f"{(na if res == 1 else nb)} WINS"
+        fb = fit_font(d, txt, "black", 110 * K, CW * 0.9, 1)
+        d.text((CX, cy0 + ch_ * 0.85), txt, font=fb, fill=rgba(COL["amb"] if res == 0 else cols[res - 1], a), anchor="mm")
+        d.text((CX, cy0 + ch_ * 0.85 + fb.size * 0.8), f"{pts[0]} - {pts[1]}", font=F("black", 64 * K), fill=rgba(FG, a), anchor="mt")
+    if sc.get("caption"):
+        text_block(d, cy0 + ch_ + 120 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):
@@ -1174,7 +1269,7 @@ def toon_frame(t, sc, layer):
     kind, who, p, cur = shot_for(t)
     talking = cur.get("who", "bot") if cur and cur["start"] <= t <= cur["end"] else None
     if kind == "card":
-        img = CARD.copy().convert("RGBA")
+        img = CARD_IMG.copy().convert("RGBA")
         x0, y0, x1, y1 = CARD_BOX
         src = layer.crop(CROP)
         k = min((x1 - x0 - 40) / src.width, (y1 - y0 - 40) / src.height) * (0.95 + 0.05 * ease((t - sc["_start"]) / 0.35))
@@ -1223,7 +1318,7 @@ def toon_cover():
     d.text((CX, H - 110), f"● HybridAi · {SPEC.get('label', '')}", font=F("bold", 34), fill=(230, 220, 205), anchor="mm", stroke_width=3, stroke_fill=(10, 8, 14))
     return img.convert("RGB")
 
-if TOON: BG_IMG, OVER, CARD = toon_stage()
+if TOON: BG_IMG, OVER, CARD_IMG = toon_stage()
 
 def frame(t):
     img = base.copy().convert("RGBA")
