@@ -48,6 +48,9 @@ Scene types (each scene also has "lines": the narration):
   curves    title, xmax, xunit (axis label, e.g. "days"), xticks: [numbers], ymax, unit, series: [{label,
             color, pts: [[x, y], ...], line (narration line that starts drawing it), end_label}]: real
             numbers over real time; each series draws itself left to right, dots on every checked point
+  lift      title, bot, seed (game = play(bot, Random(seed), trace=True)), from, upto (tick window), tps
+            (ticks/sec or "fit"), color, banner (shown while full and parked by waiting people), caption:
+            replays a real game of games/lift_rush.py (Lift Rush): floors, waiting people, the car and its riders
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1076,7 +1079,65 @@ def s_bid(d, sc, t):
     if sc.get("caption"):
         text_block(d, cy0 + ch_ + 120 * K, sc["caption"], F("body", 34 * K), DIM, a)
 
-DRAW = {"bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_lift = {}
+def lift_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _lift:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import lift_rush as G
+        _lift[k] = (G, G.play(sc["bot"], _r.Random(sc["seed"]), trace=True)["log"])
+    return _lift[k]
+
+def s_lift(d, sc, t):
+    G, log = lift_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    t0, t1 = sc.get("from", 0), min(len(log), sc.get("upto", len(log)))
+    tps = sc.get("tps", 8)
+    if tps == "fit":
+        tps = max(1.0, (t1 - t0) / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(t1 - 1, t0 + int(max(0.0, t - sc["_start"] - 0.5) * tps))
+    floor, act, n, wait, done, ages = log[i]
+    color = col(sc.get("color", "acc"))
+    frozen = act == 0 and n == G.CAP and wait[floor] > 0
+    bh = BOT + 40 - y - 20
+    rh = bh / G.FLOORS
+    x0 = CX - CW / 2
+    sx0, sx1 = x0 + 90 * K, x0 + 90 * K + rh * 1.3   # shaft
+    card(d, (x0, y, CX + CW / 2, y + bh), EDGE, (13, 16, 21), a, r=14, w=2)
+    for f in range(G.FLOORS):
+        ry = y + bh - (f + 1) * rh
+        if f: d.line([(sx1, ry + rh), (CX + CW / 2 - 20, ry + rh)], fill=rgba(GRID, a), width=2)
+        d.text((x0 + 45 * K, ry + rh / 2), str(f), font=F("monob", 34 * K), fill=rgba(DIM, a), anchor="mm")
+        pr = rh * 0.26
+        for j in range(min(wait[f], 9)):
+            px = sx1 + 40 + j * pr * 2.5
+            d.ellipse([px - pr, ry + rh / 2 - pr, px + pr, ry + rh / 2 + pr], fill=rgba(COL["amb"], a))
+        if wait[f] > 9:
+            d.text((sx1 + 40 + 9 * pr * 2.5, ry + rh / 2), f"+{wait[f] - 9}", font=F("bold", 30 * K), fill=rgba(COL["amb"], a), anchor="lm")
+    d.rectangle([sx0, y + 10, sx1, y + bh - 10], fill=rgba((8, 10, 14), a))
+    ey = y + bh - (floor + 1) * rh
+    ec = RED if frozen else color
+    d.rounded_rectangle([sx0 + 4, ey + 4, sx1 - 4, ey + rh - 4], radius=8, fill=rgba(tuple(int(v * 0.3) for v in ec), a), outline=rgba(ec, a), width=4)
+    for j in range(G.CAP):
+        cx_ = sx0 + (sx1 - sx0) * (0.22 + 0.28 * (j % 3)); cy_ = ey + rh * (0.33 + 0.34 * (j // 3))
+        r_ = rh * 0.11
+        d.ellipse([cx_ - r_, cy_ - r_, cx_ + r_, cy_ + r_], fill=rgba(FG if j < n else (40, 46, 58), a))
+    # right panel
+    px = CX + CW / 2 - 30
+    d.text((px, y + 30), f"TICK {i}", font=F("mono", 34 * K), fill=rgba(DIM, a), anchor="rt")
+    d.text((px, y + 80 * K), f"{done} done", font=F("black", 56 * K), fill=rgba(color, a), anchor="rt")
+    d.text((px, y + 150 * K), f"inside {n}/{G.CAP}", font=F("bold", 40 * K), fill=rgba(RED if n == G.CAP else FG, a), anchor="rt")
+    lw = max(ages) if ages else 0
+    d.text((px, y + 205 * K), f"longest wait {lw}", font=F("bold", 40 * K), fill=rgba(COL["amb"], a), anchor="rt")
+    if frozen and sc.get("banner"):
+        fb = F("black", 80 * K)
+        d.text((px, y + 290 * K), sc["banner"], font=fb, fill=rgba(RED, a), anchor="rt")
+    if sc.get("caption"):
+        text_block(d, y + bh + 30, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):

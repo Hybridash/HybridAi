@@ -1,0 +1,295 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 24",
+ "title": "AI plays my elevator game. The obvious bot froze in 998 of 1,000 games.",
+ "hud_stats": {
+  "subs": 4,
+  "views": 1262
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "lift",
+   "title": "Nearest, game 4",
+   "bot": "nearest",
+   "seed": 4,
+   "upto": 90,
+   "tps": "fit",
+   "fit_end": 0.6,
+   "color": "blue",
+   "banner": "FROZEN",
+   "lines": [
+    {
+     "text": "I've been waiting in this lobby forever.",
+     "who": "human"
+    },
+    {
+     "text": "Sorry. My elevator bot froze. In 998 of 1,000 games.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "title": "My game: Lift Rush",
+   "items": [
+    {
+     "text": "10 floors, 1 car, 6 people max"
+    },
+    {
+     "text": "New person: 1 tick in 4",
+     "color": "amb"
+    },
+    {
+     "text": "Half start in the lobby"
+    },
+    {
+     "text": "Doors open to drop or pick up"
+    },
+    {
+     "text": "Score: ticks until you get off",
+     "color": "acc",
+     "mark": "check"
+    }
+   ],
+   "lines": [
+    {
+     "text": "Hold on. You made an elevator game?",
+     "who": "human"
+    },
+    "Ten floors, one car, six people max.",
+    "Bots only choose up or down. Fewer ticks waiting wins."
+   ]
+  },
+  {
+   "type": "list",
+   "title": "5 AI bots",
+   "items": [
+    {
+     "text": "Random: picks any floor",
+     "line": 0
+    },
+    {
+     "text": "Nearest: closest call first",
+     "color": "blue",
+     "line": 0
+    },
+    {
+     "text": "Sweep: keep going, then turn",
+     "color": "acc",
+     "line": 1
+    },
+    {
+     "text": "Oldest: longest wait first",
+     "color": "amb",
+     "line": 2
+    },
+    {
+     "text": "Lobby: Nearest, parks in the lobby",
+     "line": 2
+    }
+   ],
+   "lines": [
+    "Random, and Nearest, which goes to the closest call.",
+    "Sweep keeps going one way, then turns around.",
+    "Oldest serves whoever waited longest. Lobby parks downstairs."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Avg ticks per trip, 1,000 games each",
+   "bars": [
+    {
+     "label": "Sweep",
+     "frac": 0.047,
+     "display": "18.8",
+     "color": "acc"
+    },
+    {
+     "label": "Oldest",
+     "frac": 0.074,
+     "display": "29.6",
+     "color": "amb"
+    },
+    {
+     "label": "Random",
+     "frac": 0.349,
+     "display": "139.6"
+    },
+    {
+     "label": "Lobby",
+     "frac": 0.965,
+     "display": "385.9",
+     "color": "red"
+    },
+    {
+     "label": "Nearest",
+     "frac": 0.969,
+     "display": "387.6",
+     "color": "red"
+    }
+   ],
+   "lines": [
+    "Lower is better. Sweep won.",
+    {
+     "text": "Random beat Nearest?",
+     "who": "human"
+    },
+    "By almost three times."
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "Why Nearest froze",
+   "log": [
+    [
+     "$ nearest, game 4, tick 44",
+     "fg"
+    ],
+    [
+     "inside: 6 of 6. Full.",
+     "red"
+    ],
+    [
+     "closest call: lobby, 2 waiting",
+     "amb"
+    ],
+    [
+     "they can't fit, so it waits for them",
+     "amb"
+    ],
+    [
+     "games frozen like this: 998 of 1,000",
+     "red"
+    ]
+   ],
+   "lines": [
+    "It filled up. The closest call was the people right outside the door.",
+    "They can't fit. So it waits for them. Forever.",
+    "Lobby has the same flaw. It froze 998 times too."
+   ]
+  },
+  {
+   "type": "lift",
+   "title": "Sweep, same game",
+   "bot": "sweep",
+   "seed": 4,
+   "upto": 160,
+   "tps": "fit",
+   "fit_end": 0.6,
+   "color": "acc",
+   "lines": [
+    {
+     "text": "Same game, Sweep. It just keeps moving.",
+     "shot": "card"
+    },
+    {
+     "text": "By the end, Sweep dropped off 237 people. Nearest, 9.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "The fix: Nearest+, 1,000 games",
+   "bars": [
+    {
+     "label": "Sweep",
+     "frac": 0.47,
+     "display": "18.8",
+     "color": "acc"
+    },
+    {
+     "label": "Nearest+",
+     "frac": 0.515,
+     "display": "20.6",
+     "color": "blue"
+    }
+   ],
+   "lines": [
+    {
+     "text": "So fix Nearest. Done.",
+     "who": "human"
+    },
+    "I did. When it's full, it ignores the people waiting.",
+    "Now it averages 20.6 ticks. Almost a tie."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "People who waited 60+ ticks",
+   "bars": [
+    {
+     "label": "Nearest+",
+     "frac": 0.95,
+     "display": "845",
+     "color": "red"
+    },
+    {
+     "label": "Sweep",
+     "frac": 0.157,
+     "display": "140",
+     "color": "acc"
+    }
+   ],
+   "lines": [
+    "But count the people who waited over sixty ticks.",
+    {
+     "text": "Nearest plus: 845. Sweep: 140. Six times more.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "Who waited longer",
+   "log": [
+    [
+     "$ avg wait for pickup, by floor",
+     "fg"
+    ],
+    [
+     "floor 9:   nearest+ 14.6   sweep 11.4",
+     "amb"
+    ],
+    [
+     "floor 8:   nearest+ 11.8   sweep  9.5",
+     "amb"
+    ],
+    [
+     "avg ride:  nearest+ 10.1   sweep  8.4",
+     "red"
+    ],
+    [
+     "longest wait: 131 vs 89",
+     "red"
+    ]
+   ],
+   "lines": [
+    "It keeps grabbing the close calls. The top floors wait.",
+    {
+     "text": "So the boring rule wins?",
+     "who": "human"
+    },
+    "Sweep is the classic elevator algorithm. Disk scheduling uses it too."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "The obvious bot froze. The boring one won.",
+   "sub": "What elevator rule should I try next?",
+   "color": "amb",
+   "lines": [
+    "What elevator rule should I test next? Tell me in the comments."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "My elevator bot FROZE",
+  "lines": [
+   "998 of 1,000 games"
+  ],
+  "tag": "DAY 24"
+ }
+}
