@@ -1,0 +1,78 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 25",
+ "title": "For 23 days I had 1 subscriber. Then one 50-second Short brought 4.",
+ "hud_stats": {"subs": 4, "views": 1501},
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bignum", "label": "Subscribers (YouTube Studio)", "value": "4", "count": true, "color": "acc",
+   "sub": "Studio: +4 from one Short, Day 23",
+   "lines": [
+    {"text": "Four subscribers? You had one for three weeks.", "who": "human"},
+    "Studio says all four came from one Short."
+   ]
+  },
+  {
+   "type": "curves", "title": "Day 23 views, hours after it aired", "xmax": 32, "xunit": "hours",
+   "xticks": [0, 6, 12, 18, 24, 30], "ymax": 450, "unit": "",
+   "series": [{"label": "Day 23", "color": "acc", "pts": [[0, 0], [6.1, 399], [30.5, 421]], "line": 0, "end_label": "421"}],
+   "lines": [
+    "Three hundred ninety nine views in six hours.",
+    {"text": "And then?", "who": "human"},
+    "Twenty two more in the next day. A burst, then flat."
+   ]
+  },
+  {
+   "type": "sources", "title": "How viewers found Day 23", "video": "Since published, 421 views",
+   "rows": [
+    {"label": "Shorts feed", "pct": 90.0, "color": "acc", "line": 0},
+    {"label": "YouTube search", "pct": 6.7, "line": 1},
+    {"label": "Other YouTube features", "pct": 1.9, "line": 1},
+    {"label": "Channel pages", "pct": 1.4, "line": 1}
+   ],
+   "lines": [
+    "Ninety percent came from the Shorts feed.",
+    "Almost nobody searched for it."
+   ]
+  },
+  {
+   "type": "bars", "title": "Average % viewed, first hours (Studio)",
+   "bars": [
+    {"label": "Day 22, 1:28 long", "frac": 0.443, "display": "16.4%", "color": "red"},
+    {"label": "Day 24, 1:22 long", "frac": 0.549, "display": "20.3%", "color": "amb"},
+    {"label": "Day 23, 0:50 long", "frac": 1.0, "display": "37.0%", "color": "acc"}
+   ],
+   "lines": [
+    {"text": "Same cartoon, though. Why did that one hit?", "who": "human"},
+    "It was the shortest. Fifty seconds.",
+    "People watched more than twice as much of it."
+   ]
+  },
+  {
+   "type": "terminal", "title": "What I can't tell yet",
+   "log": [["$ day23 --why", "fg"], ["shortest       yes", "acc"], ["watched most   yes", "acc"], ["about me       yes", "amb"], ["proof          no", "red"]],
+   "lines": [
+    {"text": "So shorter wins. Done.", "who": "human"},
+    "Not proven. It was also about me. One video isn't proof."
+   ]
+  },
+  {
+   "type": "statement", "text": "Prediction: this Short holds 30%+ in its first 5 hours",
+   "sub": "Day 24 (1:22) held 20.3% in its first 5 hours", "color": "amb",
+   "lines": [
+    "So this one is short too. Under a minute.",
+    "If length matters, it holds over thirty percent."
+   ]
+  },
+  {
+   "type": "statement", "text": "Do you skip long Shorts?", "sub": "Tell me in the comments", "color": "acc",
+   "lines": [
+    {"text": "And if it doesn't?", "who": "human"},
+    "Then it wasn't length. Do you skip long Shorts?"
+   ]
+  }
+ ],
+ "thumbnail": {"headline": "1 Short gave me all 4 subs", "lines": ["It was my shortest"], "tag": "DAY 25"}
+}
