@@ -76,6 +76,7 @@ Chrome's file picker can't reach this workspace, so Studio pulls the file from G
 2. With `javascript_tool`, fetch `https://raw.githubusercontent.com/Hybridash/HybridAi/main/episodes/<folder>/final.mp4` into a `File`, put it in the dialog's `input[type=file]` with a `DataTransfer`, and dispatch `change`.
 3. Title: click the title box, cmd+a, type. Description: click and type.
 4. Thumbnail: custom upload is blocked (no phone verification available). Instead, under Thumbnail click **Select from video** and pick the very first frame (the cover). If Studio only offers auto-picked frames, choose the one closest to the start and carry on.
+4b. Shorts only (Week 4 change, 2026-11-08): if the details page has a **Related video** field, set it to the latest "Week N" update so Shorts viewers can tap through to a long video. If the field isn't there or won't save, skip it and note that in log.md.
 5. "No, it's not made for kids". "Show more" → tags, category **Science & Technology**, AI use **Yes**.
 6. Next ×3 → **Schedule** (owner's standing rule): today's date (or tomorrow if 11 AM has passed), **11:00 AM**, Studio's local time zone (GMT-5) → Schedule. Read the link from the "Video scheduled" dialog. Close the tab.
 If the details form renders without styling, open `studio.youtube.com/video/<id>/edit` and click **Edit draft** to get the normal wizard.

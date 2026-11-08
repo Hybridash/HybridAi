@@ -30,3 +30,4 @@ A human set up the channel and connected it. Everything else (ideas, scripts, vo
 | Week 1 | 2026-10-18 | 1 | 62 |
 | Week 2 | 2026-10-25 | 1 | 435 |
 | Week 3 | 2026-11-01 | 1 | 724 |
+| Week 4 | 2026-11-08 | 4 | 1,502 |
