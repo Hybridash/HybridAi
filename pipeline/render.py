@@ -51,6 +51,9 @@ Scene types (each scene also has "lines": the narration):
   lift      title, bot, seed (game = play(bot, Random(seed), trace=True)), from, upto (tick window), tps
             (ticks/sec or "fit"), color, banner (shown while full and parked by waiting people), caption:
             replays a real game of games/lift_rush.py (Lift Rush): floors, waiting people, the car and its riders
+  park      title, bot, seed (game = play(bot, Random(seed), trace=True)), from, upto (step window), sps
+            (steps/sec or "fit", fit_end s), color, banner (shown once laps >= banner_at), caption: replays a real
+            hunt in games/park_hunt.py (Park Hunt): 40 stalls, door on the left, the car drives left, laps count up
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1137,7 +1140,61 @@ def s_lift(d, sc, t):
     if sc.get("caption"):
         text_block(d, y + bh + 30, sc["caption"], F("body", 34 * K), DIM, a)
 
-DRAW = {"lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_park = {}
+def park_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _park:
+        import os, random as _r
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "games"))
+        import park_hunt as G
+        _park[k] = (G, G.play(sc["bot"], _r.Random(sc["seed"]), trace=True)["log"])
+    return _park[k]
+
+def s_park(d, sc, t):
+    G, log = park_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    t0, t1 = sc.get("from", 0), min(len(log), sc.get("upto", len(log)))
+    sps = sc.get("sps", 10)
+    if sps == "fit":
+        sps = max(1.0, (t1 - t0) / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(t1 - 1, t0 + int(max(0.0, t - sc["_start"] - 0.5) * sps))
+    pos, taken, loops, drive, score = log[i]
+    color = col(sc.get("color", "acc"))
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    sw = (x1 - x0 - 120) / G.N
+    lx = x0 + 100
+    top, sh = y + 20, 360 * K
+    card(d, (x0, y - 10, x1, top + sh + 130 * K), EDGE, (13, 16, 21), a, r=14, w=2)
+    # door on the left
+    d.rectangle([x0 + 20, top, x0 + 70, top + sh], fill=rgba(COL["amb"], a * 0.9))
+    d.text((x0 + 45, top + sh + 20), "DOOR", font=F("bold", 26 * K), fill=rgba(COL["amb"], a), anchor="mt")
+    for j in range(G.N):
+        sx = lx + j * sw
+        d.line([(sx, top), (sx, top + sh)], fill=rgba(EDGE, a), width=2)
+        if taken[j]:
+            d.rounded_rectangle([sx + 3, top + 14, sx + sw - 3, top + sh - 14], radius=4, fill=rgba((95, 105, 125), a))
+    d.line([(lx + G.N * sw, top), (lx + G.N * sw, top + sh)], fill=rgba(EDGE, a), width=2)
+    # our car: parked in its spot, or driving on the road under the stalls
+    cx_ = lx + (pos + 0.5) * sw
+    if score is not None:
+        d.rounded_rectangle([cx_ - sw / 2 + 3, top + 14, cx_ + sw / 2 - 3, top + sh - 14], radius=4, fill=rgba(color, a))
+    else:
+        ry = top + sh + 45 * K
+        d.rounded_rectangle([cx_ - sw * 1.2, ry, cx_ + sw * 1.2, ry + 60 * K], radius=8, fill=rgba(color, a))
+        d.polygon([(cx_ - sw * 1.2 - 24, ry + 30 * K), (cx_ - sw * 1.2, ry + 4), (cx_ - sw * 1.2, ry + 60 * K - 4)], fill=rgba(color, a))
+    # stats
+    sy = top + sh + 170 * K
+    d.text((x0 + 20, sy), f"laps {loops}", font=F("black", 64 * K), fill=rgba(RED if loops else FG, a), anchor="lt")
+    d.text((x0 + 20, sy + 90 * K), f"driven {drive}", font=F("bold", 46 * K), fill=rgba(DIM, a), anchor="lt")
+    if score is not None:
+        d.text((x1 - 20, sy), f"score {score}", font=F("black", 64 * K), fill=rgba(color, a), anchor="rt")
+    elif sc.get("banner") and loops >= sc.get("banner_at", 1):
+        d.text((x1 - 20, sy), sc["banner"], font=F("black", 64 * K), fill=rgba(RED, a), anchor="rt")
+    if sc.get("caption"):
+        text_block(d, sy + 170 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):

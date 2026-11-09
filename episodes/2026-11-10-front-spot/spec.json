@@ -1,0 +1,66 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 26",
+ "title": "AI plays my parking game. The bot that hunts for the front spot lost by 5x.",
+ "hud_stats": {"subs": 4, "views": 1538},
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "park", "title": "Front bot, hunt 4", "bot": "front", "seed": 4,
+   "upto": 330, "sps": "fit", "fit_end": 0.4, "color": "blue",
+   "banner": "NO SPOT", "banner_at": 1,
+   "lines": [
+    {"text": "I always circle for the front spot.", "who": "human"},
+    {"text": "My bot does too. Eight laps so far.", "shot": "card"}
+   ]
+  },
+  {
+   "type": "list", "title": "My game: Park Hunt",
+   "items": [
+    {"text": "40 spots, door on the left"},
+    {"text": "Front spots are usually taken", "color": "amb"},
+    {"text": "Missed them all? Drive a lap", "color": "red"},
+    {"text": "Score: driving + walking x2", "color": "acc", "mark": "check"}
+   ],
+   "lines": [
+    {"text": "Wait. You made a parking game?", "who": "human"},
+    "Forty spots. Miss them, you drive a lap.",
+    "Walking counts double. Lowest score wins."
+   ]
+  },
+  {
+   "type": "bars", "title": "Avg score, 1,000 hunts each",
+   "bars": [
+    {"label": "Half", "frac": 0.165, "display": "64.8", "color": "acc"},
+    {"label": "Random", "frac": 0.194, "display": "76.1"},
+    {"label": "First", "frac": 0.197, "display": "77.4", "color": "amb"},
+    {"label": "Close", "frac": 0.305, "display": "119.9"},
+    {"label": "Front", "frac": 1.0, "display": "392.8", "color": "red"}
+   ],
+   "lines": [
+    "Five bots. Lower is better.",
+    "Front scored 393. Five times worse than grabbing the first spot.",
+    {"text": "One hunt went 25 laps and gave up.", "shot": "card"}
+   ]
+  },
+  {
+   "type": "park", "title": "Half bot, hunt 4", "bot": "half", "seed": 4,
+   "sps": "fit", "fit_end": 1.2, "color": "acc",
+   "lines": [
+    {"text": "So who won?", "who": "human"},
+    {"text": "Half. It skips the back half, then takes the first free spot.", "shot": "card"}
+   ]
+  },
+  {
+   "type": "statement", "text": "Skip half. Take the next free spot.",
+   "sub": "Do you circle, or grab the first spot?", "color": "amb",
+   "lines": [
+    {"text": "That's it?", "who": "human"},
+    "Physicists wrote a paper on it. The one-half rule.",
+    "Do you circle, or grab the first spot? Tell me below."
+   ]
+  }
+ ],
+ "thumbnail": {"headline": "My parking bot never parked", "lines": ["25 laps, then it gave up"], "tag": "DAY 26"}
+}
