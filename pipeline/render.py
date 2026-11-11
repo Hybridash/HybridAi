@@ -54,6 +54,9 @@ Scene types (each scene also has "lines": the narration):
   park      title, bot, seed (game = play(bot, Random(seed), trace=True)), from, upto (step window), sps
             (steps/sec or "fit", fit_end s), color, banner (shown once laps >= banner_at), caption: replays a real
             hunt in games/park_hunt.py (Park Hunt): 40 stalls, door on the left, the car drives left, laps count up
+  split     title, a, b (bots), seed (game = play(a, b, Random(seed), trace=True)), upto (rounds), rps (rounds/sec
+            or "fit", fit_end s), name_a, name_b, color_a, color_b: replays a real match of games/cookie_split.py
+            (Cookie Split): one cell per round for each bot (green = shared, red = grabbed), cookie totals count up
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1194,7 +1197,46 @@ def s_park(d, sc, t):
     if sc.get("caption"):
         text_block(d, sy + 170 * K, sc["caption"], F("body", 34 * K), DIM, a)
 
-DRAW = {"park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_split = {}
+def split_trace(sc):
+    k = (sc["a"], sc["b"], sc["seed"])
+    if k not in _split:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import cookie_split as G
+        _split[k] = (G, G.play(sc["a"], sc["b"], _r.Random(sc["seed"]), trace=True)["log"])
+    return _split[k]
+
+def s_split(d, sc, t):
+    G, log = split_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    n = min(len(log), sc.get("upto", len(log)))
+    rps = sc.get("rps", 20)
+    if rps == "fit":
+        rps = max(1.0, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n, int(max(0.0, t - sc["_start"] - 0.5) * rps))   # rounds played so far
+    score = (log[i - 1][2], log[i - 1][3]) if i else (0, 0)
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    cols = 20
+    rows = G.ROUNDS // cols
+    ph = (BOT + 40 - y - 60) / 2
+    for p in (0, 1):
+        py = y + p * (ph + 20)
+        c = col(sc.get("color_b" if p else "color_a", "blue" if p else "amb"))
+        card(d, (x0, py, x1, py + ph), EDGE, (13, 16, 21), a, r=14, w=2)
+        d.text((x0 + 24, py + 16), sc.get("name_b" if p else "name_a", sc["b" if p else "a"]), font=F("black", 52 * K), fill=rgba(c, a), anchor="lt")
+        d.text((x1 - 24, py + 10), f"{score[p]}", font=F("black", 64 * K), fill=rgba(FG, a), anchor="rt")
+        gy = py + 96 * K
+        cw = (x1 - x0 - 48) / cols
+        ch = (py + ph - 16 - gy) / rows
+        for j in range(G.ROUNDS):
+            bx, by = x0 + 24 + (j % cols) * cw, gy + (j // cols) * ch
+            f = (30, 35, 45) if j >= i else (RED if log[j][p] else COL["acc"])
+            d.rounded_rectangle([bx + 2, by + 2, bx + cw - 2, by + ch - 2], radius=4, fill=rgba(f, a))
+    d.text((CX, y + 2 * ph + 28), f"ROUND {i}/{G.ROUNDS}   green = share   red = grab", font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="mt")
+
+DRAW = {"split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):

@@ -1,0 +1,153 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 28",
+ "title": "AI plays my cookie game. The bot that never lost a match finished 6th of 7.",
+ "hud_stats": {
+  "subs": 4,
+  "views": 1590
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "split",
+   "title": "Grabber vs Copycat",
+   "a": "grabber",
+   "b": "copycat",
+   "seed": 1,
+   "name_a": "Grabber",
+   "name_b": "Copycat",
+   "color_a": "red",
+   "color_b": "blue",
+   "rps": "fit",
+   "fit_end": 1.0,
+   "lines": [
+    {
+     "text": "Easy. Just grab every cookie.",
+     "who": "human"
+    },
+    {
+     "text": "Grabber did. Six thousand matches, zero losses.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "title": "My game: Cookie Split",
+   "items": [
+    {
+     "text": "Both share: 3 cookies each",
+     "color": "acc"
+    },
+    {
+     "text": "One grabs: 5 and 0",
+     "color": "amb"
+    },
+    {
+     "text": "Both grab: 1 each",
+     "color": "red"
+    },
+    {
+     "text": "200 rounds, 7 bots",
+     "mark": "check"
+    }
+   ],
+   "lines": [
+    {
+     "text": "Wait, what's the game?",
+     "who": "human"
+    },
+    "Share or grab. Two hundred rounds a match.",
+    "Grab from a sharer, get five. Both grab, get one."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Avg cookies per match",
+   "bars": [
+    {
+     "label": "Forgiver",
+     "frac": 1.0,
+     "display": "497",
+     "color": "acc"
+    },
+    {
+     "label": "Copycat",
+     "frac": 0.946,
+     "display": "470"
+    },
+    {
+     "label": "Pushover",
+     "frac": 0.931,
+     "display": "463"
+    },
+    {
+     "label": "Random",
+     "frac": 0.849,
+     "display": "422"
+    },
+    {
+     "label": "Grabber",
+     "frac": 0.753,
+     "display": "375",
+     "color": "red"
+    }
+   ],
+   "lines": [
+    {
+     "text": "So Grabber won?",
+     "who": "human"
+    },
+    {
+     "text": "Sixth of seven. It wins 204 to 199.",
+     "shot": "card"
+    },
+    {
+     "text": "Forgiver won zero matches. And the whole tournament.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "split",
+   "title": "Forgiver vs Sneak",
+   "a": "forgiver",
+   "b": "sneak",
+   "seed": 3,
+   "name_a": "Forgiver",
+   "name_b": "Sneak",
+   "color_a": "acc",
+   "color_b": "amb",
+   "rps": "fit",
+   "fit_end": 1.2,
+   "lines": [
+    {
+     "text": "Zero wins? How?",
+     "who": "human"
+    },
+    {
+     "text": "It lost this one by 100. And kept 538 cookies.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Never lost. Finished 6th.",
+   "sub": "Would you share or grab?",
+   "color": "amb",
+   "lines": [
+    "Sharers pay each other 600. Grabber scrapes about 200.",
+    "Would you share or grab? Tell me below."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "My bot never lost. It came 6th.",
+  "lines": [
+   "6,000 matches, 0 losses"
+  ],
+  "tag": "DAY 28"
+ }
+}
