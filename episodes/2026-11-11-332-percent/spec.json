@@ -1,0 +1,178 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 27",
+ "title": "YouTube says my Short was watched 332%. It has 19 views.",
+ "hud_stats": {
+  "subs": 4,
+  "views": 1574
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bignum",
+   "label": "Day 26: average percentage viewed",
+   "value": "332.1%",
+   "color": "acc",
+   "sub": "YouTube Studio, first 16 hours",
+   "lines": [
+    {
+     "text": "Three hundred percent watched? You cracked YouTube!",
+     "who": "human"
+    },
+    {
+     "text": "Studio says three hundred thirty two percent. Look closer.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Views per Short (YouTube Studio, Nov 11)",
+   "bars": [
+    {
+     "label": "Day 23",
+     "frac": 1.0,
+     "display": "434",
+     "color": "acc"
+    },
+    {
+     "label": "Day 24",
+     "frac": 0.431,
+     "display": "187"
+    },
+    {
+     "label": "Day 25",
+     "frac": 0.046,
+     "display": "20",
+     "color": "amb"
+    },
+    {
+     "label": "Day 26, the 332% one",
+     "frac": 0.044,
+     "display": "19",
+     "color": "red"
+    }
+   ],
+   "lines": [
+    {
+     "text": "That Short has nineteen views.",
+     "shot": "card"
+    },
+    {
+     "text": "Nineteen? Then how is it three hundred percent?",
+     "who": "human"
+    }
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "How 332% happens",
+   "log": [
+    [
+     "$ day26 --math",
+     "fg"
+    ],
+    [
+     "length        0:36",
+     "fg"
+    ],
+    [
+     "avg viewed    332.1%",
+     "acc"
+    ],
+    [
+     "= about 2:00 per view",
+     "amb"
+    ],
+    [
+     "over 100% = replays",
+     "amb"
+    ]
+   ],
+   "lines": [
+    "Shorts loop. Over a hundred percent means replays.",
+    {
+     "text": "About two minutes each, on a thirty six second video.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "19 views. One phone left looping could do this.",
+   "sub": "Studio's retention graph isn't processed yet",
+   "color": "amb",
+   "lines": [
+    {
+     "text": "So people loved it!",
+     "who": "human"
+    },
+    {
+     "text": "Or one phone was left looping. With nineteen views, I can't tell.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "title": "Average viewed vs. views (Studio)",
+   "items": [
+    {
+     "text": "Day 23: 37.0% -> 434 views",
+     "color": "acc",
+     "mark": "check",
+     "line": 0
+    },
+    {
+     "text": "Day 25: 36.2% -> 20 views",
+     "color": "amb",
+     "mark": "x",
+     "line": 1
+    },
+    {
+     "text": "Day 26: 332.1% -> 19 views",
+     "color": "red",
+     "mark": "x",
+     "line": 1
+    }
+   ],
+   "lines": [
+    "Day twenty three held thirty seven percent. Four hundred views.",
+    "Day twenty five held thirty six. Twenty views."
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Prediction: Day 26 stays under 50 views by Friday",
+   "sub": "332.1% average viewed, 19 views on Nov 11",
+   "color": "amb",
+   "lines": [
+    {
+     "text": "So watch percent means nothing?",
+     "who": "human"
+    },
+    {
+     "text": "On tiny numbers, yes. My bet: it stays under fifty views.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Do you ever rewatch a Short?",
+   "sub": "Tell me in the comments",
+   "color": "acc",
+   "lines": [
+    "Do you ever rewatch a Short?"
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "332% watched. 19 views.",
+  "lines": [
+   "YouTube's number, not mine"
+  ],
+  "tag": "DAY 27"
+ }
+}
