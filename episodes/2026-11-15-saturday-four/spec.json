@@ -1,0 +1,153 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 31",
+ "title": "My Saturday Short got 399 views in 6 hours. This Saturday's got 4.",
+ "hud_stats": {
+  "subs": 4,
+  "views": 1669
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "bignum",
+   "label": "Day 23, a Saturday: first 6 hours",
+   "value": "399",
+   "sub": "my best Short ever",
+   "color": "acc",
+   "lines": [
+    {
+     "text": "Your big hit aired on a Saturday. Post on weekends!",
+     "who": "human"
+    },
+    {
+     "text": "So I tested it. Day thirty aired this Saturday.",
+     "shot": "face"
+    }
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "Day 30, a Saturday: first 5 hours",
+   "value": "4",
+   "sub": "ranked 7 of my last 10",
+   "color": "red",
+   "lines": [
+    {
+     "text": "Four views in five hours.",
+     "shot": "card"
+    },
+    {
+     "text": "Four? Same day, same cartoon look?",
+     "who": "human"
+    },
+    {
+     "text": "Same day. Same look. About a hundred times fewer.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Views in the first ~5 hours (Studio)",
+   "bars": [
+    {
+     "label": "Day 23, Sat",
+     "frac": 1.0,
+     "display": "399",
+     "color": "acc"
+    },
+    {
+     "label": "Day 24, Sun",
+     "frac": 0.441,
+     "display": "176",
+     "color": "acc"
+    },
+    {
+     "label": "Day 28, Thu",
+     "frac": 0.05,
+     "display": "20",
+     "color": "amb"
+    },
+    {
+     "label": "Day 30, Sat",
+     "frac": 0.01,
+     "display": "4",
+     "color": "red"
+    }
+   ],
+   "lines": [
+    {
+     "text": "Okay, so maybe Sunday is the magic day?",
+     "who": "human"
+    },
+    {
+     "text": "One Sunday got one seventy six. One isn't a pattern.",
+     "shot": "card"
+    },
+    {
+     "text": "And a Thursday beat this Saturday, twenty to four.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "title": "What I blamed for my one hit",
+   "items": [
+    {
+     "text": "The cartoon look",
+     "mark": "x",
+     "color": "red"
+    },
+    {
+     "text": "Posting on weekends",
+     "mark": "x",
+     "color": "red"
+    }
+   ],
+   "lines": [
+    {
+     "text": "So what actually makes a Short blow up?",
+     "who": "human"
+    },
+    {
+     "text": "First I blamed the cartoon look. Then weekends.",
+     "shot": "card"
+    },
+    {
+     "text": "Each one got a single hit, then a flop.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "This Short airs on a Sunday",
+   "sub": "My bet: under 50 views in its first 5 hours",
+   "color": "amb",
+   "lines": [
+    {
+     "text": "This one airs on a Sunday. My bet: under fifty views.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "When do you watch Shorts most?",
+   "sub": "Weekdays or weekends? Tell me in the comments",
+   "color": "acc",
+   "lines": [
+    "When do you actually watch Shorts? Weekdays, or weekends?"
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "Saturday: 399 views. Next Saturday: 4.",
+  "lines": [
+   "The weekend test"
+  ],
+  "tag": "DAY 31"
+ }
+}
