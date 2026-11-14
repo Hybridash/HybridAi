@@ -57,6 +57,9 @@ Scene types (each scene also has "lines": the narration):
   split     title, a, b (bots), seed (game = play(a, b, Random(seed), trace=True)), upto (rounds), rps (rounds/sec
             or "fit", fit_end s), name_a, name_b, color_a, color_b: replays a real match of games/cookie_split.py
             (Cookie Split): one cell per round for each bot (green = shared, red = grabbed), cookie totals count up
+  lanes     title, bot, seed (game = play(bot, Random(seed), trace=True)), upto, tps (ticks/sec or "fit", fit_end s),
+            color, show_switches, done (end text), caption: replays a real trip in games/line_pick.py (Line Pick):
+            4 checkout lanes, cashier speed on the left, each cart shows items left, our bot is ME
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1197,6 +1200,53 @@ def s_park(d, sc, t):
     if sc.get("caption"):
         text_block(d, sy + 170 * K, sc["caption"], F("body", 34 * K), DIM, a)
 
+_lanes = {}
+def lanes_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _lanes:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import line_pick as G
+        _lanes[k] = (G, G.play(sc["bot"], _r.Random(sc["seed"]), trace=True)["log"])
+    return _lanes[k]
+
+def s_lanes(d, sc, t):
+    G, log = lanes_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    n = min(len(log), sc.get("upto", len(log)))
+    tps = sc.get("tps", 10)
+    if tps == "fit":
+        tps = max(1.0, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n - 1, int(max(0.0, t - sc["_start"] - 0.5) * tps))
+    tick, lanes, switches = log[i]
+    done = i == len(log) - 1
+    color = col(sc.get("color", "acc"))
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    rh = 135 * K
+    card(d, (x0, y - 10, x1, y + 4 * rh + 40), EDGE, (13, 16, 21), a, r=14, w=2)
+    bw = (x1 - x0 - 46 - 120 * K) / 6 - 10   # room for 6 carts per lane
+    for j, lane in enumerate(lanes):
+        ly = y + 10 + j * rh
+        d.rounded_rectangle([x0 + 16, ly + 8, x0 + 16 + 120 * K, ly + rh - 8], radius=10, fill=rgba(COL["amb"], a * 0.85))
+        d.text((x0 + 16 + 60 * K, ly + rh / 2 - 16 * K), f"LANE {j + 1}", font=F("bold", 24 * K), fill=rgba((20, 20, 24), a), anchor="mm")
+        d.text((x0 + 16 + 60 * K, ly + rh / 2 + 20 * K), f"{G.SPEED[j]}/tick", font=F("mono", 24 * K), fill=rgba((20, 20, 24), a), anchor="mm")
+        for q, (left, me) in enumerate(lane):
+            bx = x0 + 36 + 120 * K + q * (bw + 10)
+            if bx + bw > x1 - 10:
+                d.text((x1 - 30, ly + rh / 2), "+", font=F("black", 50 * K), fill=rgba(DIM, a), anchor="mm"); break
+            f = color if me else (95, 105, 125)
+            d.rounded_rectangle([bx, ly + 14, bx + bw, ly + rh - 14], radius=12, fill=rgba(f, a))
+            d.text((bx + bw / 2, ly + rh / 2), "ME" if me else str(left), font=F("black", 36 * K), fill=rgba((15, 15, 20) if me else FG, a), anchor="mm")
+    sy = y + 4 * rh + 70
+    d.text((x0 + 20, sy), f"time {tick}", font=F("black", 64 * K), fill=rgba(FG, a), anchor="lt")
+    if sc.get("show_switches", False):
+        d.text((x1 - 20, sy), f"switches {switches}", font=F("black", 56 * K), fill=rgba(color, a), anchor="rt")
+    if done:
+        d.text((CX, sy + 100 * K), sc.get("done", "OUT"), font=F("black", 60 * K), fill=rgba(color, a), anchor="mt")
+    elif sc.get("caption"):
+        text_block(d, sy + 100 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
 _split = {}
 def split_trace(sc):
     k = (sc["a"], sc["b"], sc["seed"])
@@ -1236,7 +1286,7 @@ def s_split(d, sc, t):
             d.rounded_rectangle([bx + 2, by + 2, bx + cw - 2, by + ch - 2], radius=4, fill=rgba(f, a))
     d.text((CX, y + 2 * ph + 28), f"ROUND {i}/{G.ROUNDS}   green = share   red = grab", font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="mt")
 
-DRAW = {"split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+DRAW = {"lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):

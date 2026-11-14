@@ -1,0 +1,48 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 30",
+ "title": "AI plays my checkout game. The bot that switches lines gets out first.",
+ "hud_stats": {"subs": 4, "views": 1651},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "lanes", "title": "Shortest line bot", "bot": "people", "seed": 3003124, "tps": "fit", "fit_end": 1.0, "color": "red", "done": "OUT AT 137",
+   "lines": [
+    {"text": "Easy. Just pick the shortest line.", "who": "human"},
+    {"text": "This bot did. Lane one. Slow cashier.", "shot": "card"},
+    {"text": "Then a price check. 137 ticks.", "shot": "card"}
+   ]},
+  {"type": "list", "title": "My game: Line Pick", "items": [
+    {"text": "Cashiers: 2 to 4 items a tick", "color": "acc"},
+    {"text": "Paying: 8 ticks", "color": "amb"},
+    {"text": "Price check: 1 in 25", "color": "red"},
+    {"text": "5 bots x 10,000 trips", "mark": "check"}],
+   "lines": [
+    {"text": "Wait, what's the game?", "who": "human"},
+    "A busy shop. Four lanes. I carry fifteen items.",
+    "Nobody can see who's fast or who's stuck."
+   ]},
+  {"type": "bars", "title": "Avg wait (ticks)", "bars": [
+    {"label": "Switcher", "frac": 0.565, "display": "27.5", "color": "acc"},
+    {"label": "Fewest items", "frac": 0.6, "display": "29.2"},
+    {"label": "Fewest people", "frac": 0.624, "display": "30.4"},
+    {"label": "Random", "frac": 0.762, "display": "37.1"},
+    {"label": "Always lane 1", "frac": 1.0, "display": "48.7", "color": "red"}],
+   "lines": [
+    {"text": "So who got out first?", "who": "human"},
+    {"text": "The one that switches lines.", "shot": "card"},
+    {"text": "Always lane one waited 60 percent longer.", "shot": "card"}
+   ]},
+  {"type": "lanes", "title": "Switcher bot", "bot": "switcher", "seed": 3003124, "tps": "fit", "fit_end": 1.2, "color": "acc", "show_switches": true, "done": "OUT AT 42",
+   "lines": [
+    {"text": "Switching never works for me.", "who": "human"},
+    {"text": "Same shop. It moved once, to the fast lane. Out at 42.", "shot": "card"}
+   ]},
+  {"type": "statement", "text": "Moved in 1 of 5 trips.", "sub": "Do you switch lines?", "color": "amb",
+   "lines": [
+    "It only moved in 2,186 trips. Those averaged 29 ticks, not 42.",
+    "Do you switch lines? Tell me below."
+   ]}
+ ],
+ "thumbnail": {"headline": "Shortest line: 137. Switcher: 42.", "lines": ["10,000 trips per bot"], "tag": "DAY 30"}
+}
