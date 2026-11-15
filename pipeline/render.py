@@ -57,6 +57,9 @@ Scene types (each scene also has "lines": the narration):
   split     title, a, b (bots), seed (game = play(a, b, Random(seed), trace=True)), upto (rounds), rps (rounds/sec
             or "fit", fit_end s), name_a, name_b, color_a, color_b: replays a real match of games/cookie_split.py
             (Cookie Split): one cell per round for each bot (green = shared, red = grabbed), cookie totals count up
+  bus       title, bot, seed (game = play(bot, Random(seed), trace=True)), upto, tps (ticks/sec or "fit", fit_end s),
+            color, show_passed, done, caption: replays a real commute in games/bus_or_walk.py (Bus or Walk):
+            the road from depot to work, stops, buses, and me (dot; inside the bus once on it)
   lanes     title, bot, seed (game = play(bot, Random(seed), trace=True)), upto, tps (ticks/sec or "fit", fit_end s),
             color, show_switches, done (end text), caption: replays a real trip in games/line_pick.py (Line Pick):
             4 checkout lanes, cashier speed on the left, each cart shows items left, our bot is ME
@@ -1286,7 +1289,64 @@ def s_split(d, sc, t):
             d.rounded_rectangle([bx + 2, by + 2, bx + cw - 2, by + ch - 2], radius=4, fill=rgba(f, a))
     d.text((CX, y + 2 * ph + 28), f"ROUND {i}/{G.ROUNDS}   green = share   red = grab", font=F("mono", 28 * K), fill=rgba(DIM, a), anchor="mt")
 
-DRAW = {"lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_bus = {}
+def bus_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _bus:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import bus_or_walk as G
+        _bus[k] = (G, G.play(sc["bot"], _r.Random(sc["seed"]), trace=True)["log"])
+    return _bus[k]
+
+def s_bus(d, sc, t):
+    G, log = bus_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    n = min(len(log), sc.get("upto", len(log)))
+    tps = sc.get("tps", 10)
+    if tps == "fit":
+        tps = max(1.0, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n - 1, int(max(0.0, t - sc["_start"] - 0.5) * tps))
+    tick, buses, pos, mode, passed = log[i]
+    done = i == len(log) - 1
+    color = col(sc.get("color", "acc"))
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    card(d, (x0, y - 10, x1, y + 330 * K), EDGE, (13, 16, 21), a, r=14, w=2)
+    lo, hi = -G.DEPOT, G.END
+    def X(b): return x0 + 40 + (b - lo) / (hi - lo) * (x1 - x0 - 80)
+    ry = y + 190 * K
+    d.line([X(lo), ry, X(hi), ry], fill=rgba((90, 98, 115), a), width=int(10 * K))
+    for b in range(0, G.END, G.GAP):
+        d.line([X(b), ry - 70 * K, X(b), ry], fill=rgba(DIM, a), width=4)
+        d.rectangle([X(b) - 9, ry - 78 * K, X(b) + 9, ry - 62 * K], fill=rgba(DIM, a))
+    d.text((X(0), ry + 70 * K), "HOME", font=F("bold", 26 * K), fill=rgba(DIM, a), anchor="mt")
+    d.text((X(hi), ry + 70 * K), "WORK", font=F("bold", 26 * K), fill=rgba(COL["acc"], a), anchor="rt")
+    d.text((X(lo), ry + 70 * K), "DEPOT", font=F("bold", 26 * K), fill=rgba(DIM, a), anchor="lt")
+    bw, bh = 2.4 * (x1 - x0 - 80) / (hi - lo), 56 * K
+    for bp in buses:
+        bx = X(bp)
+        d.rounded_rectangle([bx - bw / 2, ry - 12 - bh, bx + bw / 2, ry - 12], radius=10, fill=rgba(COL["amb"], a))
+    r = 20 * K
+    if mode == "bus":
+        mx, my = X(pos), ry - 12 - bh / 2
+    else:
+        mx, my = X(pos), ry + 38 * K
+    d.ellipse([mx - r, my - r, mx + r, my + r], fill=rgba(color, a), outline=rgba((15, 15, 20), a), width=4)
+    sy = y + 360 * K
+    d.text((x0 + 20, sy), f"time {tick}", font=F("black", 64 * K), fill=rgba(FG, a), anchor="lt")
+    label = {"stop": "WAITING", "walking": "WALKING", "bus": "ON THE BUS"}[mode]
+    d.text((x1 - 20, sy), label, font=F("black", 56 * K), fill=rgba(color, a), anchor="rt")
+    yy = sy + 90 * K
+    if sc.get("show_passed", False):
+        d.text((x0 + 20, yy), f"buses that passed me: {passed}", font=F("bold", 44 * K), fill=rgba(COL["red"] if passed else DIM, a), anchor="lt")
+        yy += 70 * K
+    if done:
+        d.text((CX, yy + 20 * K), sc.get("done", "AT WORK"), font=F("black", 60 * K), fill=rgba(color, a), anchor="mt")
+    elif sc.get("caption"):
+        text_block(d, yy + 20 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):

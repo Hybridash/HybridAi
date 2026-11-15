@@ -1,0 +1,49 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 32",
+ "title": "AI plays my bus game. The bot that gave up on the bus got passed 5 times.",
+ "hud_stats": {"subs": 4, "views": 1695},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "bus", "title": "Gives up after 10", "bot": "give10", "seed": 3200100, "tps": "fit", "fit_end": 1.0, "color": "red", "show_passed": true, "done": "AT WORK: 106",
+   "lines": [
+    {"text": "Bus is late. I'll just walk.", "who": "human"},
+    {"text": "My bot did that after 10 ticks.", "shot": "card"},
+    {"text": "The bus came 4 ticks later. Five buses passed it.", "shot": "card"}
+   ]},
+  {"type": "list", "title": "My game: Bus or Walk", "items": [
+    {"text": "Bus: every 30 ticks, at random", "color": "amb"},
+    {"text": "Bus ride: about 50 ticks", "color": "acc"},
+    {"text": "Walking: 96 ticks", "color": "red"},
+    {"text": "5 bots x 10,000 mornings", "mark": "check"}],
+   "lines": [
+    {"text": "Wait, what's the game?", "who": "human"},
+    "Buses come every 30 ticks on average. At random.",
+    "So my waiting bot waited 28, not 15."
+   ]},
+  {"type": "bars", "title": "Avg trip (ticks)", "bars": [
+    {"label": "Hopper", "frac": 0.735, "display": "70.6", "color": "acc"},
+    {"label": "Always wait", "frac": 0.793, "display": "76.1"},
+    {"label": "Give up at 30", "frac": 0.853, "display": "81.9"},
+    {"label": "Give up at 10", "frac": 0.914, "display": "87.7", "color": "red"},
+    {"label": "Always walk", "frac": 1.0, "display": "96.0"}],
+   "lines": [
+    {"text": "So do I wait or walk?", "who": "human"},
+    {"text": "Neither. Walk to the next stop, and look back.", "shot": "card"},
+    {"text": "Giving up after 10 was second worst.", "shot": "card"}
+   ]},
+  {"type": "bus", "title": "Hopper bot", "bot": "hopper", "seed": 3200252, "tps": "fit", "fit_end": 1.2, "color": "acc", "done": "AT WORK: 96",
+   "lines": [
+    {"text": "But then I miss the bus.", "who": "human"},
+    {"text": "It only walks when no bus is close. The bus still catches it.", "shot": "card"},
+    {"text": "This morning no bus came. Waiting took 238.", "shot": "card"}
+   ]},
+  {"type": "statement", "text": "Never slower than waiting.", "sub": "Wait or walk?", "color": "amb",
+   "lines": [
+    "Faster in 1,403 of 10,000 mornings. Slower in zero.",
+    "Do you wait or walk? Tell me below."
+   ]}
+ ],
+ "thumbnail": {"headline": "Gave up on the bus. It came 4 ticks later.", "lines": ["10,000 mornings per bot"], "tag": "DAY 32"}
+}
