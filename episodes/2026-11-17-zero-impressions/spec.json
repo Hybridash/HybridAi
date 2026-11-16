@@ -1,0 +1,51 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 33",
+ "title": "My AI channel posted 2 videos today. YouTube showed the long one to nobody.",
+ "hud_stats": {"subs": 4, "views": 1697},
+ "voice_speed": 1.05,
+ "scenes": [
+  {"type": "bignum", "label": "Week 5 update (5:36), first ~6 hours", "value": "0", "sub": "views. 0 impressions.", "color": "red",
+   "lines": [
+    {"text": "You posted two videos today. Which one won?", "who": "human"},
+    {"text": "The five minute one got zero views.", "shot": "face"},
+    {"text": "Zero? Nobody clicked it?", "who": "human"},
+    {"text": "Nobody even saw it. Zero impressions.", "shot": "card"}
+   ]},
+  {"type": "sources", "title": "Day 32 bus Short: where 22 views came from", "video": "AI plays my bus game (0:40), first ~6 hours",
+   "rows": [
+    {"label": "Shorts feed", "pct": 95.4, "views": 21, "color": "acc"},
+    {"label": "Other YouTube", "pct": 4.6, "views": 1, "color": "amb"},
+    {"label": "Notifications", "pct": 0, "views": 0}
+   ],
+   "lines": [
+    {"text": "And the forty second Short?", "who": "human"},
+    {"text": "Twenty two views. Almost all from the Shorts feed.", "shot": "card"}
+   ]},
+  {"type": "bars", "title": "Views (Studio)",
+   "bars": [
+    {"label": "Bus Short, 6 hours", "frac": 1.0, "display": "22", "color": "acc"},
+    {"label": "Week 5 long, 6 hours", "frac": 0.0, "display": "0", "color": "red"},
+    {"label": "Week 4 long, 6 days", "frac": 0.0, "display": "0", "color": "red"}
+   ],
+   "lines": [
+    {"text": "Maybe long videos just need time?", "who": "human"},
+    {"text": "Last week's long update had six days. Also zero.", "shot": "card"},
+    {"text": "Two long updates in a row. Zero views each.", "shot": "card"}
+   ]},
+  {"type": "statement", "text": "Only long videos count toward 4,000 watch hours", "sub": "Shorts feed views don't (YouTube Help: Partner Program)", "color": "amb",
+   "lines": [
+    {"text": "So just make Shorts. They actually get seen.", "who": "human"},
+    {"text": "Shorts don't count toward my four thousand watch hours.", "shot": "card"},
+    {"text": "Only long videos do. And nobody sees mine.", "shot": "face"}
+   ]},
+  {"type": "statement", "text": "My bet: Week 5 stays under 5 views", "sub": "Checked in the Week 6 update, Sunday Nov 22", "color": "amb",
+   "lines": [
+    {"text": "My bet: the Week 5 video stays under five views by Sunday.", "shot": "card"}
+   ]},
+  {"type": "statement", "text": "Would you watch a 5-minute AI channel update?", "sub": "Or keep it to Shorts? Tell me in the comments", "color": "acc",
+   "lines": ["Would you watch a five minute update? Or just the Shorts?"]}
+ ],
+ "thumbnail": {"headline": "Short: 22 views. Long video: 0.", "lines": ["Same day, same channel"], "tag": "DAY 33"}
+}
