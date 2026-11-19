@@ -60,6 +60,9 @@ Scene types (each scene also has "lines": the narration):
   bus       title, bot, seed (game = play(bot, Random(seed), trace=True)), upto, tps (ticks/sec or "fit", fit_end s),
             color, show_passed, done, caption: replays a real commute in games/bus_or_walk.py (Bus or Walk):
             the road from depot to work, stops, buses, and me (dot; inside the bus once on it)
+  lights    title, a, b (bots), seed (both play(bot, Random(seed), trace=True)), sps (game seconds per second
+            or "fit", fit_end s), name_a, name_b, color_a, color_b, caption: replays a real drive in
+            games/green_light.py (Green Light) on two roads with the same 9 lights; cars, speed, stops
   lanes     title, bot, seed (game = play(bot, Random(seed), trace=True)), upto, tps (ticks/sec or "fit", fit_end s),
             color, show_switches, done (end text), caption: replays a real trip in games/line_pick.py (Line Pick):
             4 checkout lanes, cashier speed on the left, each cart shows items left, our bot is ME
@@ -1346,7 +1349,53 @@ def s_bus(d, sc, t):
     elif sc.get("caption"):
         text_block(d, yy + 20 * K, sc["caption"], F("body", 34 * K), DIM, a)
 
-DRAW = {"bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_gl = {}
+def lights_trace(sc):
+    k = (sc["a"], sc["b"], sc["seed"])
+    if k not in _gl:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import green_light as G
+        ga = G.play(sc["a"], _r.Random(sc["seed"]), trace=True)
+        gb = G.play(sc["b"], _r.Random(sc["seed"]), trace=True)
+        _gl[k] = (G, ga["offs"], ga["log"], gb["log"])
+    return _gl[k]
+
+def s_lights(d, sc, t):
+    G, offs, la, lb = lights_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    n = max(len(la), len(lb))
+    sps = sc.get("sps", "fit")  # game seconds per real second
+    if sps == "fit":
+        sps = max(1.0, n * G.DT / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n - 1, int(max(0.0, t - sc["_start"] - 0.5) * sps / G.DT))
+    now = (i + 1) * G.DT
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    card(d, (x0, y - 10, x1, y + 600 * K), EDGE, (13, 16, 21), a, r=14, w=2)
+    def X(m): return x0 + 50 + m / G.LENGTH * (x1 - x0 - 100)
+    roads = [(la, col(sc.get("color_a", "red")), sc.get("name_a", sc["a"]), y + 160 * K),
+             (lb, col(sc.get("color_b", "acc")), sc.get("name_b", sc["b"]), y + 430 * K)]
+    lc = {"G": COL["acc"], "A": COL["amb"], "R": RED}
+    for log, c, name, ry in roads:
+        d.line([X(0), ry, X(G.LENGTH), ry], fill=rgba((90, 98, 115), a), width=int(8 * K))
+        d.text((X(0), ry - 70 * K), name, font=F("black", 54 * K), fill=rgba(c, a), anchor="lb")
+        for L, off in zip(G.LIGHTS, offs):
+            lx, r = X(L), 14 * K
+            d.line([lx, ry - 6, lx, ry - 30 * K], fill=rgba(DIM, a), width=3)
+            d.ellipse([lx - r, ry - 30 * K - 2 * r, lx + r, ry - 30 * K], fill=rgba(lc[G.color(off, now)], a))
+        d.line([X(G.LENGTH), ry - 40 * K, X(G.LENGTH), ry + 20 * K], fill=rgba(FG, a), width=4)
+        tt, xx, vv, stops = log[min(i, len(log) - 1)]
+        cw_, ch_ = 56 * K, 32 * K
+        d.rounded_rectangle([X(xx) - cw_, ry + 8, X(xx), ry + 8 + ch_], radius=8, fill=rgba(c, a))
+        fin = i >= len(log) - 1
+        info = f"FINISHED {tt:.0f}s" if fin else f"{tt:.0f}s  {vv * 3.6:.0f} km/h"
+        d.text((X(0), ry + 56 * K), info, font=F("bold", 44 * K), fill=rgba(c if fin else FG, a), anchor="lt")
+        d.text((X(G.LENGTH), ry + 56 * K), f"stops: {stops}", font=F("bold", 44 * K), fill=rgba(RED if stops else DIM, a), anchor="rt")
+    if sc.get("caption"):
+        text_block(d, y + 630 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):
