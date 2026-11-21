@@ -66,6 +66,9 @@ Scene types (each scene also has "lines": the narration):
   lanes     title, bot, seed (game = play(bot, Random(seed), trace=True)), upto, tps (ticks/sec or "fit", fit_end s),
             color, show_switches, done (end text), caption: replays a real trip in games/line_pick.py (Line Pick):
             4 checkout lanes, cashier speed on the left, each cart shows items left, our bot is ME
+  vac       title, bot, seed (room = play(bot, Random(seed), trace=True)), upto (turns), tps (turns/sec or "fit",
+            fit_end s), name, color, caption: replays a real run of games/robo_vac.py (Robo Vac): the room grid,
+            furniture, cleaned cells fill in, the robot, % clean, bumps
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1395,7 +1398,55 @@ def s_lights(d, sc, t):
     if sc.get("caption"):
         text_block(d, y + 630 * K, sc["caption"], F("body", 34 * K), DIM, a)
 
-DRAW = {"lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_rv = {}
+def vac_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _rv:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import robo_vac as V
+        _rv[k] = (V, V.play(sc["bot"], _r.Random(sc["seed"]), trace=True))
+    return _rv[k]
+
+def s_vac(d, sc, t):
+    V, g = vac_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    log = g["log"][: sc.get("upto", len(g["log"]) - 1) + 1]
+    n = len(log)
+    tps = sc.get("tps", "fit")  # turns per second
+    if tps == "fit":
+        tps = max(1.0, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n - 1, int(max(0.0, t - sc["_start"] - 0.5) * tps))
+    c = col(sc.get("color", "acc"))
+    gy = y + 40 * K
+    # fit grid + two text rows inside the toon card's crop window (CROP bottom 1300 on Shorts)
+    cs = int(min((CW - 40) / V.COLS, ((1280 if SHORT else H - 170) - gy - 150 * K) / V.ROWS))
+    gx = CX - cs * V.COLS / 2
+    card(d, (gx - 20, gy - 20, gx + cs * V.COLS + 20, gy + cs * V.ROWS + 20), EDGE, (13, 16, 21), a, r=14, w=2)
+    clean = {p for p, _ in log[: i + 1]}
+    for xx in range(V.COLS):
+        for yy in range(V.ROWS):
+            box = [gx + xx * cs + 2, gy + yy * cs + 2, gx + (xx + 1) * cs - 2, gy + (yy + 1) * cs - 2]
+            if (xx, yy) in g["block"]:
+                d.rounded_rectangle(box, radius=6, fill=rgba((70, 58, 48), a))
+            elif (xx, yy) in clean:
+                d.rounded_rectangle(box, radius=6, fill=rgba(shade(c, 0.55), a))
+            else:
+                d.rounded_rectangle(box, radius=6, fill=rgba((44, 40, 36), a))
+    d.text((gx + 6, gy + 4), "DOCK", font=F("bold", 18 * K), fill=rgba(FG, a * 0.8), anchor="lt")
+    (px, py), bumps = log[i]
+    r = cs * 0.42
+    ccx, ccy = gx + (px + 0.5) * cs, gy + (py + 0.5) * cs
+    d.ellipse([ccx - r, ccy - r, ccx + r, ccy + r], fill=rgba(FG, a), outline=rgba(c, a), width=5)
+    pct = len(clean) / g["floor"] * 100
+    sy = gy + cs * V.ROWS + 35 * K
+    d.text((gx, sy), sc.get("name", sc["bot"]), font=F("black", 52 * K), fill=rgba(c, a), anchor="lt")
+    d.text((gx + cs * V.COLS, sy), f"{pct:.0f}% clean", font=F("black", 52 * K), fill=rgba(FG, a), anchor="rt")
+    d.text((gx, sy + 68 * K), f"turn {i} of {V.BATTERY}", font=F("bold", 38 * K), fill=rgba(DIM, a), anchor="lt")
+    d.text((gx + cs * V.COLS, sy + 68 * K), f"bumps: {bumps}", font=F("bold", 38 * K), fill=rgba(DIM, a), anchor="rt")
+
+DRAW = {"vac": s_vac, "lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):

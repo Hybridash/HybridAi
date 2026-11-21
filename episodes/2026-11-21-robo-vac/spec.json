@@ -1,0 +1,144 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 36",
+ "title": "AI plays my robot vacuum game. The neat bot got stuck. The random one cleaned more.",
+ "hud_stats": {
+  "subs": 5,
+  "views": 1819
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "vac",
+   "title": "Neat rows, like a lawnmower",
+   "bot": "mower",
+   "seed": 3600112,
+   "upto": 400,
+   "tps": "fit",
+   "fit_end": 1.0,
+   "name": "Mower",
+   "color": "amb",
+   "lines": [
+    {
+     "text": "I'd clean in neat rows. Like a lawnmower.",
+     "who": "human"
+    },
+    {
+     "text": "My mower bot does that. Watch.",
+     "shot": "card"
+    },
+    {
+     "text": "Stuck by a chair. No new floor after turn 104.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "title": "My game: Robo Vac",
+   "items": [
+    {
+     "text": "No camera, only bumps",
+     "color": "red"
+    },
+    {
+     "text": "Battery: 400 moves",
+     "color": "acc"
+    },
+    {
+     "text": "4 bots x 10,000 rooms",
+     "mark": "check"
+    }
+   ],
+   "lines": [
+    {
+     "text": "Wait, what's the game?",
+     "who": "human"
+    },
+    "A room with furniture. The robot can't see. It only feels bumps.",
+    "Four hundred moves of battery. Ten thousand rooms."
+   ]
+  },
+  {
+   "type": "bars",
+   "title": "Avg floor cleaned",
+   "bars": [
+    {
+     "label": "Mapper",
+     "frac": 1.0,
+     "display": "100%",
+     "color": "acc"
+    },
+    {
+     "label": "Bounce",
+     "frac": 0.77,
+     "display": "77.0%",
+     "color": "blue"
+    },
+    {
+     "label": "Mower",
+     "frac": 0.536,
+     "display": "53.6%",
+     "color": "amb"
+    }
+   ],
+   "lines": [
+    {
+     "text": "So which one won?",
+     "who": "human"
+    },
+    {
+     "text": "Random bouncing beat neat rows. 77 to 54 percent.",
+     "shot": "card"
+    },
+    {
+     "text": "The mower got stuck in 9,502 of 10,000 rooms.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "vac",
+   "title": "Same room, remembers every bump",
+   "bot": "mapper",
+   "seed": 3600112,
+   "upto": 256,
+   "tps": "fit",
+   "fit_end": 1.2,
+   "name": "Mapper",
+   "color": "acc",
+   "lines": [
+    {
+     "text": "And the green one?",
+     "who": "human"
+    },
+    {
+     "text": "It remembers every bump and every clean spot.",
+     "shot": "card"
+    },
+    {
+     "text": "Whole room, in all 10,000.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "Early robot vacuums bounced at random. Newer ones map the room.",
+   "sub": "Rows or random?",
+   "color": "acc",
+   "lines": [
+    "Real robot vacuums went the same way.",
+    "Would you trust rows or random? Tell me below."
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "The neat bot got stuck. Random cleaned more.",
+  "lines": [
+   "10,000 rooms per bot"
+  ],
+  "tag": "DAY 36"
+ }
+}
