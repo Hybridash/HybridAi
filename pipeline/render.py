@@ -69,6 +69,10 @@ Scene types (each scene also has "lines": the narration):
   vac       title, bot, seed (room = play(bot, Random(seed), trace=True)), upto (turns), tps (turns/sec or "fit",
             fit_end s), name, color, caption: replays a real run of games/robo_vac.py (Robo Vac): the room grid,
             furniture, cleaned cells fill in, the robot, % clean, bumps
+  pizza     title, bot, seed (evening = play(bot, Random(seed), trace=True)), upto (minutes), mps (minutes/sec or
+            "fit", fit_end s), name, color, watch (order id to ring), caption: replays a real evening of
+            games/pizza_rush.py (Pizza Rush): 9x9 town, shop in the middle, waiting orders turn amber then red
+            with age, the driver, delivered count, and the ringed order's wait
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1446,7 +1450,76 @@ def s_vac(d, sc, t):
     d.text((gx, sy + 68 * K), f"turn {i} of {V.BATTERY}", font=F("bold", 38 * K), fill=rgba(DIM, a), anchor="lt")
     d.text((gx + cs * V.COLS, sy + 68 * K), f"bumps: {bumps}", font=F("bold", 38 * K), fill=rgba(DIM, a), anchor="rt")
 
-DRAW = {"vac": s_vac, "lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_pz = {}
+def pizza_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _pz:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import pizza_rush as P
+        _pz[k] = (P, P.play(sc["bot"], _r.Random(sc["seed"]), trace=True))
+    return _pz[k]
+
+def s_pizza(d, sc, t):
+    P, g = pizza_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    fr = g["frames"][: sc.get("upto", len(g["frames"]))]
+    n = len(fr)
+    mps = sc.get("mps", "fit")  # game minutes per second
+    if mps == "fit":
+        mps = max(1.0, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n - 1, int(max(0.0, t - sc["_start"] - 0.5) * mps))
+    tm, pos, waiting, bag, done = fr[i]
+    c = col(sc.get("color", "acc"))
+    gy = y + 40 * K
+    cs = int(min((CW - 40) / P.SIZE, ((1280 if SHORT else H - 170) - gy - 150 * K) / P.SIZE))
+    gx = CX - cs * P.SIZE / 2
+    card(d, (gx - 20, gy - 20, gx + cs * P.SIZE + 20, gy + cs * P.SIZE + 20), EDGE, (13, 16, 21), a, r=14, w=2)
+    for xx in range(P.SIZE):
+        for yy in range(P.SIZE):
+            box = [gx + xx * cs + 8, gy + yy * cs + 8, gx + (xx + 1) * cs - 8, gy + (yy + 1) * cs - 8]
+            d.rounded_rectangle(box, radius=8, fill=rgba((44, 40, 36), a))
+    sx, sy0 = P.SHOP
+    d.rounded_rectangle([gx + sx * cs + 4, gy + sy0 * cs + 4, gx + (sx + 1) * cs - 4, gy + (sy0 + 1) * cs - 4], radius=10, fill=rgba(shade(c, 0.55), a))
+    d.text((gx + (sx + 0.5) * cs, gy + (sy0 + 0.5) * cs), "SHOP", font=F("bold", 20 * K), fill=rgba(FG, a), anchor="mm")
+    od = g["od"]
+    watch = sc.get("watch")
+    for oid in waiting + bag:
+        o = od[oid]
+        age = tm - o["t"]
+        cc = COL["acc"] if age <= 15 else COL["amb"] if age <= P.COLD else COL["red"]
+        hx, hy = gx + (o["house"][0] + 0.5) * cs, gy + (o["house"][1] + 0.5) * cs
+        r = cs * 0.22
+        d.ellipse([hx - r, hy - r, hx + r, hy + r], fill=rgba(cc, a))
+    if watch is not None:
+        o = od[watch]
+        hx, hy = gx + (o["house"][0] + 0.5) * cs, gy + (o["house"][1] + 0.5) * cs
+        if o["t"] < tm and (watch in waiting or watch in bag):
+            r = cs * 0.42
+            d.ellipse([hx - r, hy - r, hx + r, hy + r], outline=rgba(FG, a), width=5)
+    px, py = pos
+    r = cs * 0.3
+    ccx, ccy = gx + (px + 0.5) * cs, gy + (py + 0.5) * cs
+    d.rounded_rectangle([ccx - r, ccy - r * 0.7, ccx + r, ccy + r * 0.7], radius=8, fill=rgba(FG, a), outline=rgba(c, a), width=5)
+    by = gy + cs * P.SIZE + 35 * K
+    lx, rx = CX - (CW - 120) / 2, CX + (CW - 120) / 2
+    d.text((lx, by), sc.get("name", sc["bot"]), font=F("black", 46 * K), fill=rgba(c, a), anchor="lt")
+    d.text((rx, by), f"{done}/{g['orders']} delivered", font=F("black", 40 * K), fill=rgba(FG, a), anchor="rt")
+    d.text((lx, by + 62 * K), f"minute {tm}", font=F("bold", 34 * K), fill=rgba(DIM, a), anchor="lt")
+    if watch is not None:
+        o = od[watch]
+        if tm <= o["t"]:
+            txt, cc = "ringed: not ordered", DIM
+        elif watch in waiting or watch in bag:
+            txt, cc = f"ringed: waiting {tm - o['t']} min", RED
+        else:
+            txt, cc = f"ringed: {o['wait']} min", FG
+        d.text((rx, by + 62 * K), txt, font=F("bold", 34 * K), fill=rgba(cc, a), anchor="rt")
+    if sc.get("caption"):
+        text_block(d, by + 130 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"pizza": s_pizza, "vac": s_vac, "lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):
