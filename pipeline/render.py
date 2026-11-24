@@ -73,6 +73,9 @@ Scene types (each scene also has "lines": the narration):
             "fit", fit_end s), name, color, watch (order id to ring), caption: replays a real evening of
             games/pizza_rush.py (Pizza Rush): 9x9 town, shop in the middle, waiting orders turn amber then red
             with age, the driver, delivered count, and the ringed order's wait
+  board     title, bot, seed (game = play(bot, Random(seed), trace=True)), sps (game seconds/sec or "fit", fit_end s),
+            name, color, caption: replays a real boarding in games/board_rush.py (Board Rush): the plane sideways
+            (door left, seats A-C, aisle, D-F), seated passengers fill in, aisle walkers white, bag-stowers amber
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1519,7 +1522,57 @@ def s_pizza(d, sc, t):
     if sc.get("caption"):
         text_block(d, by + 130 * K, sc["caption"], F("body", 34 * K), DIM, a)
 
-DRAW = {"pizza": s_pizza, "vac": s_vac, "lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_br = {}
+def board_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _br:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import board_rush as B
+        _br[k] = (B, B.play(sc["bot"], _r.Random(sc["seed"]), trace=True))
+    return _br[k]
+
+def s_board(d, sc, t):
+    B, g = board_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    fr = g["frames"]
+    n = len(fr)
+    sps = sc.get("sps", "fit")  # game seconds per second
+    if sps == "fit":
+        sps = max(1.0, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n - 1, int(max(0.0, t - sc["_start"] - 0.5) * sps))
+    tm, aisle, seated, inline = fr[i]
+    c = col(sc.get("color", "acc"))
+    # plane drawn sideways: nose + door on the left, rows left to right, seats A-C on top, aisle, D-F below
+    cs = int((CW - 40) / (B.ROWS + 1.5))
+    gx = CX - cs * (B.ROWS + 1.5) / 2 + cs * 1.5
+    gy = y + 60 * K
+    card(d, (gx - cs * 1.5 - 10, gy - 20, gx + cs * B.ROWS + 20, gy + cs * 7 + 20), EDGE, (13, 16, 21), a, r=cs, w=2)
+    d.text((gx - cs * 0.75, gy + cs * 3.5), "DOOR", font=F("bold", 16 * K), fill=rgba(DIM, a), anchor="mm")
+    for r in range(B.ROWS):
+        for j, s_ in enumerate("ABC_DEF"):
+            box = [gx + r * cs + 3, gy + j * cs + 3, gx + (r + 1) * cs - 3, gy + (j + 1) * cs - 3]
+            if s_ == "_":
+                continue
+            fill = shade(c, 0.75) if (r, s_) in seated else (44, 40, 36)
+            d.rounded_rectangle(box, radius=6, fill=rgba(fill, a))
+        p = aisle[r]
+        if p is not None:
+            stow = g["line"][p]["row"] == r
+            ccx, ccy, rr = gx + (r + 0.5) * cs, gy + 3.5 * cs, cs * 0.36
+            d.ellipse([ccx - rr, ccy - rr, ccx + rr, ccy + rr], fill=rgba(COL["amb"] if stow else FG, a))
+    by = gy + cs * 7 + 45 * K
+    lx, rx = CX - (CW - 60) / 2, CX + (CW - 60) / 2
+    d.text((lx, by), sc.get("name", sc["bot"]), font=F("black", 50 * K), fill=rgba(c, a), anchor="lt")
+    d.text((rx, by), f"{tm // 60}:{tm % 60:02d}", font=F("black", 50 * K), fill=rgba(FG, a), anchor="rt")
+    d.text((lx, by + 68 * K), f"seated {len(seated)}/{g['n']}", font=F("bold", 36 * K), fill=rgba(DIM, a), anchor="lt")
+    d.text((rx, by + 68 * K), f"in line {inline}", font=F("bold", 36 * K), fill=rgba(DIM, a), anchor="rt")
+    d.text((lx, by + 120 * K), "amber = stowing a bag in the aisle", font=F("bold", 30 * K), fill=rgba(COL["amb"], a * 0.9), anchor="lt")
+    if sc.get("caption"):
+        text_block(d, by + 180 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"board": s_board, "pizza": s_pizza, "vac": s_vac, "lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):
