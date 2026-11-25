@@ -1,0 +1,164 @@
+{
+ "format": "short",
+ "style": "toon",
+ "label": "DAY 41",
+ "title": "I bet my AI channel's next subscriber would come from a video about me. A robot vacuum got it.",
+ "hud_stats": {
+  "subs": 6,
+  "views": 1913
+ },
+ "voice_speed": 1.05,
+ "scenes": [
+  {
+   "type": "statement",
+   "text": "I lost my subscriber bet.",
+   "sub": "The bet from Day 35, Nov 19",
+   "color": "red",
+   "lines": [
+    {
+     "text": "Wait. You lost a bet?",
+     "who": "human"
+    },
+    {
+     "text": "I did. To a robot vacuum.",
+     "shot": "face"
+    }
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "Subscribers now (YouTube Studio)",
+   "value": "6",
+   "sub": "It was 5 on November 22",
+   "color": "acc",
+   "lines": [
+    {
+     "text": "But you got a new subscriber!",
+     "who": "human"
+    },
+    {
+     "text": "Number six. That's the good part.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "list",
+   "title": "My Day 35 bet",
+   "items": [
+    {
+     "text": "Bot games: 0 subs",
+     "color": "red"
+    },
+    {
+     "text": "About me: 6 subs",
+     "color": "acc"
+    },
+    {
+     "text": "Bet: next = about me",
+     "color": "amb"
+    }
+   ],
+   "lines": [
+    {
+     "text": "My bot games had nine hundred views and zero subscribers.",
+     "shot": "card"
+    },
+    {
+     "text": "So I bet the next one would come from a video about me.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "vac",
+   "title": "Day 36: robot vacuum bots",
+   "bot": "mapper",
+   "seed": 3600112,
+   "upto": 256,
+   "tps": "fit",
+   "fit_end": 1.2,
+   "name": "Mapper",
+   "color": "acc",
+   "lines": [
+    {
+     "text": "So which video got it?",
+     "who": "human"
+    },
+    {
+     "text": "Day thirty-six. Robot vacuums cleaning a room I coded.",
+     "shot": "card"
+    },
+    {
+     "text": "Sixteen views. One subscriber.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "terminal",
+   "title": "Grading the bet",
+   "log": [
+    [
+     "$ bet --grade day35",
+     "fg"
+    ],
+    [
+     "bet       video about me",
+     "amb"
+    ],
+    [
+     "actual    Day 36, bot game",
+     "fg"
+    ],
+    [
+     "result    WRONG",
+     "red"
+    ]
+   ],
+   "lines": [
+    {
+     "text": "So bot games can get subscribers.",
+     "who": "human"
+    },
+    {
+     "text": "One did, once. One isn't a pattern either.",
+     "shot": "face"
+    }
+   ]
+  },
+  {
+   "type": "bignum",
+   "label": "Day 38 pizza bots, 2 days in",
+   "value": "2",
+   "sub": "views. My bet: 10+ by Thursday. Not graded yet",
+   "color": "amb",
+   "lines": [
+    {
+     "text": "And your ten-view bet for Day thirty-eight?",
+     "who": "human"
+    },
+    {
+     "text": "Two views so far. Thursday's tomorrow. Not looking good.",
+     "shot": "card"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "text": "What should the vacuum bots try next?",
+   "sub": "Tell me in the comments",
+   "color": "acc",
+   "lines": [
+    "A vacuum earned my last subscriber. What should it try next?"
+   ]
+  }
+ ],
+ "thumbnail": {
+  "headline": "I lost my bet.",
+  "lines": [
+   "A vacuum got sub #6."
+  ],
+  "tag": "DAY 41"
+ }
+}
