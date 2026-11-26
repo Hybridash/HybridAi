@@ -76,6 +76,10 @@ Scene types (each scene also has "lines": the narration):
   board     title, bot, seed (game = play(bot, Random(seed), trace=True)), sps (game seconds/sec or "fit", fit_end s),
             name, color, caption: replays a real boarding in games/board_rush.py (Board Rush): the plane sideways
             (door left, seats A-C, aisle, D-F), seated passengers fill in, aisle walkers white, bag-stowers amber
+  merge     title, bot, seed (game = play(bot, Random(seed), trace=True)), sps (game seconds/sec or "fit", fit_end s),
+            upto (last game second shown), name, color, caption: replays a real rush hour in games/lane_drop.py
+            (Lane Drop): the whole road on a thin strip (cars red when crawling), a close-up of the work zone,
+            jam length and cars through
 Items/bars/log rows reveal one by one across the scene, or at {"line": i} if given.
 
 "style": "toon" (daily Shorts): a warm stage with the HybridAi bot standing on it, each scene shown on
@@ -1572,7 +1576,72 @@ def s_board(d, sc, t):
     if sc.get("caption"):
         text_block(d, by + 180 * K, sc["caption"], F("body", 34 * K), DIM, a)
 
-DRAW = {"board": s_board, "pizza": s_pizza, "vac": s_vac, "lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
+_ld = {}
+def merge_trace(sc):
+    k = (sc["bot"], sc["seed"])
+    if k not in _ld:
+        import random as _r
+        sys.path.insert(0, os.path.join(HERE, "..", "games"))
+        import lane_drop as L
+        _ld[k] = (L, L.play(sc["bot"], _r.Random(sc["seed"]), trace=True))
+    return _ld[k]
+
+def s_merge(d, sc, t):
+    L, g = merge_trace(sc)
+    a = ease((t - sc["_start"] + 0.1) / 0.4)
+    y = head(d, sc, t, TOP)
+    fr = g["frames"][:sc.get("upto", len(g["frames"]))]
+    n = len(fr)
+    sps = sc.get("sps", "fit")
+    if sps == "fit":
+        sps = max(1.0, n / max(1.0, sc["_end"] - sc["_start"] - 0.5 - sc.get("fit_end", 1.6)))
+    i = min(n - 1, int(max(0.0, t - sc["_start"] - 0.5) * sps))
+    tm, cars, done, q = fr[i]
+    c = col(sc.get("color", "acc"))
+    x0, x1 = CX - CW / 2, CX + CW / 2
+    card(d, (x0, y - 10, x1, y + 560 * K), EDGE, (13, 16, 21), a, r=14, w=2)
+    def carcol(lane, v):
+        return RED if v <= 1 else (COL["amb"] if lane == 0 else FG)
+    # whole road strip
+    pad = 30
+    def X(m): return x0 + pad + m / L.END * (x1 - x0 - 2 * pad)
+    sy, lh = y + 40 * K, 20 * K
+    d.text((X(0), sy - 8), "the whole road (1.7 km)", font=F("bold", 26 * K), fill=rgba(DIM, a), anchor="lb")
+    for ln in (0, 1):
+        e = L.DROP if ln == 0 else L.END
+        d.rectangle([X(0), sy + ln * lh, X(e), sy + (ln + 1) * lh - 3], fill=rgba((40, 44, 54), a))
+    d.line([X(L.SIGN), sy - 4, X(L.SIGN), sy + lh], fill=rgba(COL["amb"], a), width=2)
+    for ln, x, v in cars:
+        d.rectangle([X(x), sy + ln * lh + 2, X(x + 1) - 1, sy + (ln + 1) * lh - 5], fill=rgba(carcol(ln, v), a))
+    zx = X(L.DROP - 30)
+    d.rectangle([zx, sy - 6, X(L.DROP + 8), sy + 2 * lh + 3], outline=rgba(c, a * 0.8), width=2)
+    # close-up of the work zone
+    v0, v1 = L.DROP - 30, L.DROP + 8
+    def Z(m): return x0 + pad + (m - v0) / (v1 - v0) * (x1 - x0 - 2 * pad)
+    zy, zl = sy + 2 * lh + 70 * K, 64 * K
+    d.text((Z(v0), zy - 10), "close-up: where the left lane ends", font=F("bold", 26 * K), fill=rgba(DIM, a), anchor="lb")
+    for ln in (0, 1):
+        e = L.DROP if ln == 0 else v1
+        d.rounded_rectangle([Z(v0), zy + ln * zl, Z(e), zy + (ln + 1) * zl - 6], radius=8, fill=rgba((40, 44, 54), a))
+    for k in range(4):   # cones at the end of the left lane
+        cx_, cy_ = Z(L.DROP) + 6 + k * 10, zy + 6 + k * (zl - 18) / 3
+        d.polygon([(cx_, cy_), (cx_ - 7, cy_ + 16), (cx_ + 7, cy_ + 16)], fill=rgba(COL["amb"], a))
+    cw = (Z(1) - Z(0))
+    for ln, x, v in cars:
+        if v0 <= x < v1:
+            d.rounded_rectangle([Z(x) + 2, zy + ln * zl + 12, Z(x) + cw - 2, zy + (ln + 1) * zl - 18], radius=5,
+                                fill=rgba(carcol(ln, v), a))
+    by = zy + 2 * zl + 40 * K
+    lx, rx = x0 + 40, x1 - 40
+    d.text((lx, by), sc.get("name", sc["bot"]), font=F("black", 50 * K), fill=rgba(c, a), anchor="lt")
+    d.text((rx, by), f"{tm // 60}:{tm % 60:02d}", font=F("black", 50 * K), fill=rgba(FG, a), anchor="rt")
+    d.text((lx, by + 68 * K), f"jam {q * L.CELL:,.0f} m", font=F("bold", 38 * K), fill=rgba(RED if q > 20 else DIM, a), anchor="lt")
+    d.text((rx, by + 68 * K), f"through {done}", font=F("bold", 38 * K), fill=rgba(DIM, a), anchor="rt")
+    d.text((lx, by + 124 * K), "red = crawling   amber = left lane", font=F("bold", 30 * K), fill=rgba(DIM, a * 0.9), anchor="lt")
+    if sc.get("caption"):
+        text_block(d, by + 180 * K, sc["caption"], F("body", 34 * K), DIM, a)
+
+DRAW = {"merge": s_merge, "board": s_board, "pizza": s_pizza, "vac": s_vac, "lights": s_lights, "bus": s_bus, "lanes": s_lanes, "split": s_split, "park": s_park, "lift": s_lift, "bid": s_bid, "curves": s_curves, "grab": s_grab, "duel": s_duel, "sources": s_sources, "notify": s_notify, "snake": s_snake, "forage": s_forage, "catch": s_catch, "dice": s_dice, "maze": s_maze, "search": s_search, "game": s_game, "title": s_title, "statement": s_statement, "bignum": s_bignum, "list": s_list,
         "bars": s_bars, "terminal": s_terminal, "chart": s_chart}
 
 def hud(img, t, FG=FG, DIM=DIM):
